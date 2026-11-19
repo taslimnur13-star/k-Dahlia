@@ -1,1155 +1,4 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kardek Digital - Ruang Dahlia</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS v2 CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
-            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
-          },
-          colors: {
-            royal: {
-              50: '#eef4fc',
-              100: '#dce8fa',
-              200: '#bfd6f6',
-              400: '#5d93eb',
-              500: '#3574e2',
-              600: '#2563c9',
-              700: '#1c54b2',
-              800: '#174596',
-              900: '#15346e',
-            }
-          }
-        }
-      }
-    }
-  </script>
-
-  <style>
-    body {
-      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-      background-color: #2563c9;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .outer-blue-bg {
-      background-color: #2563c9;
-      background-image:
-        radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.09) 0%, transparent 38%),
-        radial-gradient(circle at 88% 82%, rgba(15, 45, 110, 0.3) 0%, transparent 45%);
-    }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-    /* Google Drive Authentic Folder Card Shape */
-    .folder-card {
-      position: relative;
-      padding-top: 14px;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-    .folder-card:hover { transform: translateY(-3px); }
-    .folder-tab {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 44%;
-      height: 22px;
-      border-top-left-radius: 14px;
-      border-top-right-radius: 14px;
-      clip-path: polygon(0 0, 82% 0, 100% 100%, 0% 100%);
-    }
-    .folder-body {
-      position: relative;
-      border-radius: 0 18px 18px 18px;
-      padding: 18px;
-      min-height: 132px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .folder-card.active-blue .folder-tab,
-    .folder-card.active-blue .folder-body {
-      background: linear-gradient(135deg, #2b6ee0 0%, #2563c9 100%);
-      color: #ffffff;
-    }
-    .folder-card.active-blue .folder-body {
-      box-shadow: 0 14px 26px -10px rgba(37, 99, 201, 0.55);
-    }
-    .folder-card.soft-gray .folder-tab,
-    .folder-card.soft-gray .folder-body {
-      background-color: #f3f6fb;
-      color: #15346e;
-    }
-    .folder-card.soft-gray:hover .folder-tab,
-    .folder-card.soft-gray:hover .folder-body {
-      background-color: #eaf1fb;
-    }
-
-    /* Clean Google Drive Table Rows */
-    .drive-table {
-      border-collapse: separate;
-      border-spacing: 0 4px;
-    }
-    .drive-table tbody tr {
-      transition: background-color 0.15s ease;
-    }
-    .drive-table tbody tr:hover td,
-    .drive-table tbody tr.row-selected td {
-      background-color: #eef4fc;
-    }
-    .drive-table tbody tr td:first-child {
-      border-top-left-radius: 14px;
-      border-bottom-left-radius: 14px;
-    }
-    .drive-table tbody tr td:last-child {
-      border-top-right-radius: 14px;
-      border-bottom-right-radius: 14px;
-    }
-
-    /* Toast animation */
-    @keyframes slideInRight {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    .toast-enter { animation: slideInRight 0.25s ease-out forwards; }
-
-    /* Print Styles */
-    @media print {
-      @page { size: A4 landscape; margin: 12mm; }
-      body {
-        background: #ffffff !important;
-        color: #000000 !important;
-        padding: 0 !important;
-        font-size: 11px !important;
-      }
-      .no-print { display: none !important; }
-      .print-only { display: block !important; }
-      #app-frame {
-        box-shadow: none !important;
-        border-radius: 0 !important;
-        max-width: 100% !important;
-        min-height: auto !important;
-        margin: 0 !important;
-        overflow: visible !important;
-      }
-      #main-scroll-area {
-        overflow: visible !important;
-        height: auto !important;
-        padding: 0 !important;
-      }
-      table.print-table {
-        width: 100% !important;
-        border-collapse: collapse !important;
-      }
-      table.print-table th,
-      table.print-table td {
-        border: 1px solid #334155 !important;
-        padding: 6px 8px !important;
-        vertical-align: top !important;
-      }
-      table.print-table th {
-        background-color: #eef4fc !important;
-        color: #15346e !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-      .print-badge {
-        border: 1px solid #b45309 !important;
-        background-color: #fef3c7 !important;
-        color: #92400e !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-    }
-  </style>
-</head>
-<body class="outer-blue-bg text-slate-800 antialiased selection:bg-royal-100 selection:text-royal-900 min-h-screen lg:p-5 xl:p-6">
-
-  <!-- ==================== TOAST CONTAINER ==================== -->
-  <div id="toast-container" class="fixed top-5 right-5 z-[80] flex flex-col gap-2 max-w-sm w-full px-4 sm:px-0 no-print pointer-events-none"></div>
-
-  <!-- ==================== CUSTOM CONFIRM MODAL ==================== -->
-  <div id="confirm-modal" class="fixed inset-0 z-[75] hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 no-print">
-    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 border border-slate-100">
-      <div class="flex items-start gap-4">
-        <div class="w-11 h-11 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
-        </div>
-        <div class="flex-1">
-          <h3 id="confirm-title" class="text-lg font-bold text-slate-900">Konfirmasi</h3>
-          <p id="confirm-message" class="text-sm text-slate-600 mt-1 leading-relaxed">Apakah Anda yakin?</p>
-        </div>
-      </div>
-      <div class="mt-6 flex justify-end gap-2.5">
-        <button id="confirm-cancel-btn" type="button" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Batal</button>
-        <button id="confirm-ok-btn" type="button" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 transition shadow-sm">Ya, Lanjutkan</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== MODAL HUBUNGKAN SUPABASE ==================== -->
-  <div id="supabase-modal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 no-print">
-    <div class="bg-white rounded-[28px] shadow-2xl max-w-lg w-full overflow-hidden border border-slate-100">
-      <div class="px-6 py-4 bg-royal-600 text-white flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75"/></svg>
-          <h3 class="font-bold text-base">Pengaturan Koneksi Supabase</h3>
-        </div>
-        <button onclick="closeSupabaseModal()" class="w-8 h-8 rounded-full hover:bg-white/20 flex items-center justify-center transition">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-      </div>
-      <form onsubmit="handleConnectSupabaseFromModal(event)" class="p-6 space-y-4">
-        <p class="text-xs text-slate-500 leading-relaxed">
-          Kredensial Supabase Ruang Dahlia sudah tertanam otomatis di aplikasi ini. Anda dapat menguji ulang koneksi atau mengubahnya sementara di sini.
-        </p>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Project URL Supabase</label>
-          <input type="url" id="sb-modal-url" required placeholder="https://xxxxx.supabase.co"
-            class="w-full px-4 py-2.5 rounded-xl bg-[#f3f6fb] border border-slate-200 focus:bg-white focus:border-royal-500 text-sm font-mono outline-none" />
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Anon / Publishable Key</label>
-          <textarea id="sb-modal-key" rows="3" required placeholder="sb_publishable_..."
-            class="w-full px-4 py-2.5 rounded-xl bg-[#f3f6fb] border border-slate-200 focus:bg-white focus:border-royal-500 text-xs font-mono outline-none"></textarea>
-        </div>
-        <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
-          <button type="button" onclick="disconnectSupabase()" class="px-4 py-2 rounded-full text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 transition">
-            Mode Lokal Sementara
-          </button>
-          <div class="flex gap-2">
-            <button type="button" onclick="closeSupabaseModal()" class="px-4 py-2 rounded-full text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Tutup</button>
-            <button type="submit" class="px-5 py-2 rounded-full text-xs font-bold text-white bg-royal-600 hover:bg-royal-700 shadow-sm transition">Simpan & Uji Koneksi</button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ==================== AUTHENTICATION SCREEN ==================== -->
-  <section id="auth-screen" class="min-h-screen lg:min-h-[calc(100vh-3rem)] flex items-center justify-center p-4 no-print">
-    <div class="w-full max-w-md bg-white rounded-[32px] shadow-2xl overflow-hidden border border-white/30">
-      <div class="px-8 pt-8 pb-5 text-center">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-royal-50 text-royal-600 mb-4 border border-royal-100">
-          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"/></svg>
-        </div>
-        <h1 class="text-2xl font-extrabold text-royal-800 tracking-tight">Kardek Ruang Dahlia</h1>
-        <p class="text-slate-500 text-xs mt-1">Sistem Kardek Digital & Sinkronisasi Supabase</p>
-
-        <!-- Connection Pill on Login -->
-        <div class="mt-3 flex items-center justify-center gap-2">
-          <span id="auth-conn-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-            <span>Menghubungkan...</span>
-          </span>
-          <button type="button" onclick="openSupabaseModal()" class="text-[11px] font-bold text-royal-600 hover:underline">
-            Pengaturan DB
-          </button>
-        </div>
-      </div>
-
-      <!-- Tabs -->
-      <div class="px-8">
-        <div class="grid grid-cols-2 bg-[#f1f4f9] p-1 rounded-full">
-          <button id="tab-login-btn" onclick="switchAuthTab('login')" class="py-2 text-xs sm:text-sm font-bold rounded-full bg-royal-600 text-white shadow-sm transition">Masuk Perawat</button>
-          <button id="tab-register-btn" onclick="switchAuthTab('register')" class="py-2 text-xs sm:text-sm font-semibold rounded-full text-slate-600 hover:text-royal-800 transition">Daftar Akun Baru</button>
-        </div>
-      </div>
-
-      <!-- Login Form -->
-      <form id="login-form" onsubmit="handleLogin(event)" class="p-8 pt-6 space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Username</label>
-          <input type="text" id="login-username" required placeholder="Contoh: perawat1"
-            class="w-full px-4 py-3 rounded-2xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 focus:ring-2 focus:ring-royal-100 outline-none text-sm font-medium transition" />
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Password</label>
-          <input type="password" id="login-password" required placeholder="Masukkan password"
-            class="w-full px-4 py-3 rounded-2xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 focus:ring-2 focus:ring-royal-100 outline-none text-sm font-medium transition" />
-        </div>
-        <button type="submit" id="btn-login-submit" class="w-full py-3.5 rounded-full bg-royal-600 hover:bg-royal-700 text-white font-bold text-sm shadow-lg shadow-royal-600/25 transition">
-          Masuk ke Dashboard
-        </button>
-
-        <div class="pt-2">
-          <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2.5 text-center">Isi Cepat Akun Demo</p>
-          <div class="grid grid-cols-2 gap-2.5">
-            <button type="button" onclick="fillDemoLogin('perawat1', '123456')" class="p-3 rounded-2xl bg-[#f3f6fb] hover:bg-royal-50 border border-slate-200/70 hover:border-royal-300 text-left transition">
-              <p class="text-xs font-bold text-royal-900">Perawat Jaga</p>
-              <p class="text-[11px] text-slate-500 font-mono mt-0.5">perawat1 / 123456</p>
-            </button>
-            <button type="button" onclick="fillDemoLogin('karu', '123456')" class="p-3 rounded-2xl bg-[#f3f6fb] hover:bg-royal-50 border border-slate-200/70 hover:border-royal-300 text-left transition">
-              <p class="text-xs font-bold text-royal-900">Kepala Ruangan</p>
-              <p class="text-[11px] text-slate-500 font-mono mt-0.5">karu / 123456</p>
-            </button>
-          </div>
-        </div>
-      </form>
-
-      <!-- Register Form -->
-      <form id="register-form" onsubmit="handleRegister(event)" class="p-8 pt-6 space-y-3.5 hidden">
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Nama Lengkap & Gelar</label>
-          <input type="text" id="reg-name" required placeholder="Ns. Budi Santoso, S.Kep"
-            class="w-full px-4 py-2.5 rounded-2xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 outline-none text-sm font-medium" />
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Username</label>
-            <input type="text" id="reg-username" required placeholder="perawat2"
-              class="w-full px-4 py-2.5 rounded-2xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 outline-none text-sm font-medium" />
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Jabatan / Shift</label>
-            <select id="reg-jabatan" class="w-full px-3 py-2.5 rounded-2xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 outline-none text-sm font-semibold text-slate-700">
-              <option value="Perawat Pelaksana">Perawat Pelaksana</option>
-              <option value="Katim">Katim</option>
-              <option value="Kepala Ruangan">Kepala Ruangan</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Password</label>
-          <input type="password" id="reg-password" required minlength="4" placeholder="Minimal 4 karakter"
-            class="w-full px-4 py-2.5 rounded-2xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 outline-none text-sm font-medium" />
-        </div>
-        <button type="submit" class="w-full py-3.5 rounded-full bg-royal-600 hover:bg-royal-700 text-white font-bold text-sm shadow-lg shadow-royal-600/25 transition mt-2">
-          Daftar & Masuk Sekarang
-        </button>
-      </form>
-    </div>
-  </section>
-
-  <!-- ==================== MAIN WHITE APP SHELL (GOOGLE DRIVE STYLE) ==================== -->
-  <div id="app-frame" class="hidden max-w-[1440px] mx-auto bg-white lg:rounded-[28px] shadow-[0_24px_60px_-15px_rgba(10,35,90,0.45)] min-h-screen lg:min-h-[calc(100vh-3rem)] flex overflow-hidden relative">
-
-    <!-- MOBILE DRAWER BACKDROP -->
-    <div id="mobile-drawer-backdrop" onclick="toggleMobileDrawer(false)" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden lg:hidden no-print"></div>
-
-    <!-- ==================== LEFT SIDEBAR ==================== -->
-    <aside id="app-sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-[264px] bg-white flex flex-col shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-out no-print">
-
-      <!-- TOP LEFT WHITE BRAND AREA -->
-      <div class="h-20 px-6 flex items-center justify-between bg-white shrink-0">
-        <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('dashboard')">
-          <div class="w-9 h-9 rounded-xl bg-royal-600 text-white flex items-center justify-center shadow-sm">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-          </div>
-          <div>
-            <span class="text-lg font-extrabold text-royal-700 tracking-tight block leading-none">Kardek Dahlia</span>
-            <span class="text-[10px] font-semibold text-slate-400">Ruang Perawatan</span>
-          </div>
-        </div>
-        <button onclick="toggleMobileDrawer(false)" class="lg:hidden p-2 rounded-xl text-slate-400 hover:bg-slate-100">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-      </div>
-
-      <!-- CURVED ROYAL BLUE PANEL (rounded-tr-[40px]) -->
-      <div class="flex-1 bg-[#2563c9] text-white rounded-tr-[40px] px-5 pt-7 pb-6 flex flex-col justify-between overflow-y-auto">
-        <div>
-          <!-- White Pill Button -->
-          <button onclick="openPatientModal(); toggleMobileDrawer(false);" class="w-full py-3 px-5 rounded-full bg-white hover:bg-royal-50 text-[#2563c9] font-bold text-sm shadow-lg shadow-blue-950/20 transition flex items-center justify-center gap-2 mb-7">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-            <span>Tambah Pasien</span>
-          </button>
-
-          <!-- 5 Navigation Items -->
-          <nav class="space-y-1.5">
-            <button onclick="navigateTo('dashboard')" data-nav="dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition">
-              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
-              <span>Daftar Pasien & Obat</span>
-            </button>
-            <button onclick="navigateTo('balance')" data-nav="balance" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition">
-              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>
-              <span>Balance Cairan</span>
-            </button>
-            <button onclick="navigateTo('vascon')" data-nav="vascon" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition">
-              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
-              <span>Vascon & Dobutamin</span>
-            </button>
-            <button onclick="navigateTo('recap')" data-nav="recap" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition">
-              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5z"/></svg>
-              <span>Rekap & Cetak Obat</span>
-            </button>
-            <button onclick="navigateTo('database')" data-nav="database" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition">
-              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75"/></svg>
-              <span>Pengaturan Database</span>
-            </button>
-          </nav>
-        </div>
-
-        <!-- BOTTOM ROOM STATS (PROGRESS BARS) -->
-        <div class="pt-6 mt-6 border-t border-white/15 space-y-4">
-          <p class="text-[11px] font-bold tracking-[0.12em] text-blue-200/90 uppercase">Statistik Ruangan</p>
-
-          <div>
-            <div class="flex items-center justify-between text-xs font-semibold text-white mb-1.5">
-              <span>Bed Terisi</span>
-              <span id="sidebar-bed-pct" class="text-blue-200">0%</span>
-            </div>
-            <div class="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
-              <div id="sidebar-bed-bar" class="h-full bg-white rounded-full transition-all duration-500" style="width: 0%"></div>
-            </div>
-            <p id="sidebar-bed-text" class="text-[11px] text-blue-100/90 mt-1">0 dari 16 Bed terisi</p>
-          </div>
-
-          <div>
-            <div class="flex items-center justify-between text-xs font-semibold text-white mb-1.5">
-              <span>Obat Shift Ini</span>
-              <span id="sidebar-med-pct" class="text-blue-200">0%</span>
-            </div>
-            <div class="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
-              <div id="sidebar-med-bar" class="h-full bg-white rounded-full transition-all duration-500" style="width: 0%"></div>
-            </div>
-            <p id="sidebar-med-text" class="text-[11px] text-blue-100/90 mt-1">0 dari 0 jadwal diberikan</p>
-          </div>
-
-          <div class="pt-2">
-            <button onclick="handleLogout()" class="text-left text-xs font-bold text-white hover:text-blue-200 transition flex items-center gap-1.5">
-              <span>Keluar / Ganti Perawat</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <!-- ==================== RIGHT MAIN CONTENT ==================== -->
-    <div class="flex-1 flex flex-col min-w-0 bg-white">
-
-      <!-- TOP HEADER BAR -->
-      <header class="h-20 px-4 sm:px-7 flex items-center justify-between gap-3 bg-white shrink-0 border-b border-slate-100 no-print">
-        <div class="flex items-center gap-2.5 flex-1 max-w-lg">
-          <button onclick="toggleMobileDrawer(true)" class="lg:hidden w-10 h-10 rounded-full bg-[#f1f4f9] text-royal-800 flex items-center justify-center shrink-0">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
-          </button>
-
-          <div class="relative flex-1">
-            <svg class="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
-            <input type="text" id="global-search" oninput="handleGlobalSearch()" placeholder="Cari pasien, No RM, bed, DPJP, obat..."
-              class="w-full pl-10 pr-4 py-2.5 rounded-full bg-[#f1f4f9] hover:bg-[#e9eef6] focus:bg-white border border-transparent focus:border-royal-300 focus:ring-2 focus:ring-royal-100 outline-none text-xs sm:text-sm text-slate-700 placeholder:text-slate-400 transition" />
-          </div>
-        </div>
-
-        <!-- Right Header Controls: Status Supabase, Refresh, Nurse Profile -->
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-          <!-- Connection Status Badge -->
-          <button id="header-conn-btn" onclick="openSupabaseModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition" title="Klik untuk atur koneksi Supabase">
-            <span id="header-conn-dot" class="w-2 h-2 rounded-full bg-amber-500"></span>
-            <span id="header-conn-text" class="hidden sm:inline">Mode Lokal</span>
-          </button>
-
-          <!-- Manual Refresh Data Button -->
-          <button onclick="manualRefreshData()" id="btn-refresh-data" class="w-9 h-9 rounded-full bg-[#f3f6fb] hover:bg-royal-100 text-royal-700 flex items-center justify-center transition" title="Refresh Data Sekarang">
-            <svg id="refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
-          </button>
-
-          <!-- Nurse Name + Avatar -->
-          <div class="flex items-center gap-2 pl-1">
-            <div class="hidden md:block text-right">
-              <p id="header-nurse-name" class="text-xs font-bold text-slate-700 leading-tight max-w-[140px] truncate">Ns. Perawat</p>
-              <p id="header-nurse-role" class="text-[10px] text-slate-400">Perawat Pelaksana</p>
-            </div>
-            <div id="header-nurse-avatar" onclick="handleLogout()" title="Klik untuk ganti akun / keluar"
-              class="w-9 h-9 rounded-full bg-royal-600 text-white font-bold text-xs flex items-center justify-center shadow-sm cursor-pointer">
-              P
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <!-- SCROLLABLE MAIN CONTENT -->
-      <main id="main-scroll-area" class="flex-1 overflow-y-auto px-4 sm:px-7 py-6 space-y-7">
-
-        <!-- ==================== PAGE 1: DAFTAR PASIEN & OBAT ==================== -->
-        <section id="page-dashboard" class="page-section space-y-7">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-              <h2 class="text-2xl font-extrabold text-royal-800 tracking-tight">Ruang Dahlia</h2>
-              <button onclick="openPatientModal()" class="w-9 h-9 rounded-xl bg-royal-600 hover:bg-royal-700 text-white flex items-center justify-center shadow-sm transition" title="Tambah Pasien Baru">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-              </button>
-            </div>
-            <span id="dashboard-date-label" class="text-xs font-semibold text-slate-500 bg-[#f3f6fb] px-3.5 py-2 rounded-xl w-fit">-</span>
-          </div>
-
-          <!-- 4 AKSES CEPAT FOLDER CARDS -->
-          <div>
-            <h3 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-[0.14em] mb-3.5">Akses Cepat</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-              <!-- Folder 1: Active Royal Blue -->
-              <div onclick="setDashboardFilter('ALL')" id="qa-card-all" class="folder-card active-blue">
-                <div class="folder-tab"></div>
-                <div class="folder-body">
-                  <div>
-                    <p class="text-[10px] font-bold uppercase tracking-wider text-blue-200">Pasien Dirawat</p>
-                    <div id="qa-avatars-patients" class="flex items-center -space-x-2 mt-2.5"></div>
-                  </div>
-                  <div class="mt-4 flex items-end justify-between">
-                    <div>
-                      <p class="text-[10px] uppercase tracking-wider text-blue-200 font-semibold">Folder Utama</p>
-                      <p class="text-sm font-extrabold text-white mt-0.5">Pasien Aktif</p>
-                    </div>
-                    <span id="qa-count-patients" class="text-xl font-extrabold text-white">0</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Folder 2: Obat Belum Diberikan -->
-              <div onclick="setDashboardFilter('PENDING_MED')" id="qa-card-pending" class="folder-card soft-gray">
-                <div class="folder-tab"></div>
-                <div class="folder-body">
-                  <div>
-                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Jadwal Obat</p>
-                    <div id="qa-avatars-pending" class="flex items-center -space-x-2 mt-2.5"></div>
-                  </div>
-                  <div class="mt-4 flex items-end justify-between">
-                    <div>
-                      <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Perlu Diberikan</p>
-                      <p class="text-sm font-extrabold text-royal-800 mt-0.5">Obat Belum Diberikan</p>
-                    </div>
-                    <span id="qa-count-pending" class="text-xl font-extrabold text-royal-600">0</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Folder 3: Antibiotik / Transfusi -->
-              <div onclick="setDashboardFilter('AB_TF')" id="qa-card-abtf" class="folder-card soft-gray">
-                <div class="folder-tab"></div>
-                <div class="folder-body">
-                  <div>
-                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Terapi Khusus</p>
-                    <div id="qa-avatars-abtf" class="flex items-center -space-x-2 mt-2.5"></div>
-                  </div>
-                  <div class="mt-4 flex items-end justify-between">
-                    <div>
-                      <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Pantauan Khusus</p>
-                      <p class="text-sm font-extrabold text-royal-800 mt-0.5">Antibiotik / Transfusi</p>
-                    </div>
-                    <span id="qa-count-abtf" class="text-xl font-extrabold text-royal-600">0</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Folder 4: Pasien Vasoaktif / Balance -->
-              <div onclick="navigateTo('vascon')" class="folder-card soft-gray">
-                <div class="folder-tab"></div>
-                <div class="folder-body">
-                  <div>
-                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Titrasi & Cairan</p>
-                    <div id="qa-avatars-vasobal" class="flex items-center -space-x-2 mt-2.5"></div>
-                  </div>
-                  <div class="mt-4 flex items-end justify-between">
-                    <div>
-                      <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Pemantauan</p>
-                      <p class="text-sm font-extrabold text-royal-800 mt-0.5">Vasoaktif / Balance</p>
-                    </div>
-                    <span id="qa-count-vasobal" class="text-xl font-extrabold text-royal-600">0</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- DAFTAR PASIEN TABLE -->
-          <div>
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-              <div class="flex items-center gap-2">
-                <h3 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-[0.14em]">Daftar Pasien Ruang Dahlia</h3>
-                <button id="clear-filter-btn" onclick="setDashboardFilter('ALL')" class="hidden text-[11px] font-bold text-royal-600 bg-royal-50 px-2.5 py-0.5 rounded-full">Reset Filter</button>
-              </div>
-              <span id="patient-filter-info" class="text-xs text-slate-400 font-medium"></span>
-            </div>
-
-            <div class="overflow-x-auto">
-              <table class="w-full text-left drive-table min-w-[740px]">
-                <thead>
-                  <tr class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    <th class="py-2.5 px-3">Pasien & No RM</th>
-                    <th class="py-2.5 px-3">Bed / Kelas / DPJP</th>
-                    <th class="py-2.5 px-3">Ringkasan Terapi</th>
-                    <th class="py-2.5 px-3 text-right">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="dashboard-patient-tbody" class="text-sm"></tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- ==================== PANEL DETAIL PASIEN & PEMBERIAN OBAT ==================== -->
-          <div id="patient-detail-panel" class="hidden rounded-[26px] border border-slate-200/80 bg-[#f9fbff] overflow-hidden shadow-sm">
-            <!-- Header Banner -->
-            <div id="detail-patient-banner" class="bg-gradient-to-r from-[#2563c9] to-[#3574e2] p-5 text-white"></div>
-
-            <!-- 3 Clinical Sub-Tabs -->
-            <div class="p-4 sm:p-5 space-y-5">
-              <div class="flex flex-wrap gap-2 bg-white p-1.5 rounded-2xl border border-slate-200/70">
-                <button onclick="switchDetailTab('obat')" data-dtab="obat" class="detail-tab flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition">
-                  Jadwal Obat (Pagi/Siang/Malam)
-                </button>
-                <button onclick="switchDetailTab('abtf')" data-dtab="abtf" class="detail-tab flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition">
-                  Antibiotik & Transfusi
-                </button>
-                <button onclick="switchDetailTab('tindakan')" data-dtab="tindakan" class="detail-tab flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition">
-                  Catatan Tindakan / Lab
-                </button>
-              </div>
-
-              <!-- TAB 1: JADWAL OBAT -->
-              <div id="detail-panel-obat" class="detail-subpanel space-y-5">
-                <form onsubmit="handleAddObat(event)" class="bg-white rounded-2xl p-4 border border-slate-200/70 space-y-3">
-                  <h4 class="font-bold text-royal-900 text-xs uppercase tracking-wider">Tambah Jadwal Obat</h4>
-                  <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-                    <div class="md:col-span-4">
-                      <label class="block text-[11px] font-bold text-slate-600 mb-1">Nama Obat</label>
-                      <input type="text" id="in-obat-nama" required placeholder="Misal: Ceftriaxone" class="w-full px-3 py-2 rounded-xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 text-sm outline-none" />
-                    </div>
-                    <div class="md:col-span-2">
-                      <label class="block text-[11px] font-bold text-slate-600 mb-1">Dosis / Rute</label>
-                      <input type="text" id="in-obat-dosis" placeholder="1 gr IV" class="w-full px-3 py-2 rounded-xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 text-sm outline-none" />
-                    </div>
-                    <div class="md:col-span-2">
-                      <label class="block text-[11px] font-bold text-amber-700 mb-1">Pagi</label>
-                      <input type="text" id="in-obat-pagi" placeholder="09:00" class="w-full px-3 py-2 rounded-xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-mono outline-none" />
-                    </div>
-                    <div class="md:col-span-2">
-                      <label class="block text-[11px] font-bold text-orange-700 mb-1">Siang</label>
-                      <input type="text" id="in-obat-siang" placeholder="17:00" class="w-full px-3 py-2 rounded-xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-mono outline-none" />
-                    </div>
-                    <div class="md:col-span-2">
-                      <label class="block text-[11px] font-bold text-indigo-700 mb-1">Malam</label>
-                      <input type="text" id="in-obat-malam" placeholder="21:00" class="w-full px-3 py-2 rounded-xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-mono outline-none" />
-                    </div>
-                  </div>
-                  <div class="flex justify-end">
-                    <button type="submit" class="px-5 py-2 rounded-full bg-royal-600 hover:bg-royal-700 text-white text-xs font-bold shadow-sm transition">
-                      + Simpan Jadwal Obat
-                    </button>
-                  </div>
-                </form>
-
-                <div class="overflow-x-auto bg-white rounded-2xl border border-slate-200/70 p-2">
-                  <div class="flex items-center justify-between px-3 py-2">
-                    <span class="text-[11px] font-bold text-slate-400 uppercase">Daftar Jadwal Obat</span>
-                    <span class="text-[11px] text-slate-400">Klik chip jam untuk centang obat sudah diberikan</span>
-                  </div>
-                  <table class="w-full text-left drive-table min-w-[600px]">
-                    <thead>
-                      <tr class="text-[11px] font-bold text-slate-400 uppercase">
-                        <th class="py-2 px-3">Obat & Dosis</th>
-                        <th class="py-2 px-3 text-center">Pagi</th>
-                        <th class="py-2 px-3 text-center">Siang</th>
-                        <th class="py-2 px-3 text-center">Malam</th>
-                        <th class="py-2 px-3 text-right">Hapus</th>
-                      </tr>
-                    </thead>
-                    <tbody id="detail-obat-tbody" class="text-sm"></tbody>
-                  </table>
-                </div>
-              </div>
-
-              <!-- TAB 2: ANTIBIOTIK & TRANSFUSI -->
-              <div id="detail-panel-abtf" class="detail-subpanel hidden grid grid-cols-1 lg:grid-cols-2 gap-5">
-                <!-- Left: Antibiotik -->
-                <div class="bg-white rounded-2xl p-4 border border-slate-200/70 space-y-4">
-                  <h4 class="font-bold text-amber-800 text-xs uppercase tracking-wider flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Penghitung Antibiotik (Hari ke-X)
-                  </h4>
-                  <form onsubmit="handleAddAntibiotik(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-                    <input type="text" id="in-ab-nama" required placeholder="Nama Antibiotik (Misal: Ceftriaxone)" class="sm:col-span-6 px-3 py-2 rounded-xl bg-[#f3f6fb] text-xs font-medium outline-none focus:bg-white focus:border focus:border-royal-400" />
-                    <input type="number" id="in-ab-hari" min="1" value="1" required placeholder="Hari" class="sm:col-span-3 px-3 py-2 rounded-xl bg-[#f3f6fb] text-xs font-bold outline-none" title="Hari ke-" />
-                    <button type="submit" class="sm:col-span-3 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition">+ Tambah</button>
-                  </form>
-                  <div id="detail-ab-list" class="space-y-2"></div>
-                </div>
-
-                <!-- Right: Transfusi Darah -->
-                <div class="bg-white rounded-2xl p-4 border border-slate-200/70 space-y-4">
-                  <div class="flex items-center justify-between gap-2">
-                    <h4 class="font-bold text-rose-700 text-xs uppercase tracking-wider flex items-center gap-2">
-                      <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Transfusi Darah (Kolf)
-                    </h4>
-                    <button type="button" onclick="quickAddKolf()" class="px-3 py-1 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold shadow-xs transition">
-                      +1 Kolf Cepat
-                    </button>
-                  </div>
-                  <div class="rounded-xl bg-rose-50 border border-rose-100 px-4 py-2.5 flex items-center justify-between">
-                    <span class="text-xs font-bold text-rose-800">Total Masuk</span>
-                    <span id="detail-tf-total" class="text-lg font-extrabold text-rose-700">0 Kolf</span>
-                  </div>
-                  <form onsubmit="handleAddTransfusi(event)" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    <select id="in-tf-jenis" class="px-2.5 py-2 rounded-xl bg-[#f3f6fb] text-xs font-bold outline-none">
-                      <option value="PRC">PRC</option>
-                      <option value="WB">WB</option>
-                      <option value="TC">TC</option>
-                      <option value="FFP">FFP</option>
-                    </select>
-                    <select id="in-tf-gol" class="px-2.5 py-2 rounded-xl bg-[#f3f6fb] text-xs font-bold outline-none">
-                      <option value="A+">Gol A+</option>
-                      <option value="B+">Gol B+</option>
-                      <option value="O+">Gol O+</option>
-                      <option value="AB+">Gol AB+</option>
-                      <option value="-">Lainnya</option>
-                    </select>
-                    <input type="number" id="in-tf-kolf" min="1" value="1" required placeholder="Kolf" class="px-2.5 py-2 rounded-xl bg-[#f3f6fb] text-xs font-bold outline-none" />
-                    <input type="text" id="in-tf-jam" placeholder="10:30" required class="px-2.5 py-2 rounded-xl bg-[#f3f6fb] text-xs font-mono outline-none" />
-                    <button type="submit" class="col-span-2 sm:col-span-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition">+ Catat Transfusi</button>
-                  </form>
-                  <div id="detail-tf-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
-                </div>
-              </div>
-
-              <!-- TAB 3: CATATAN TINDAKAN / LAB -->
-              <div id="detail-panel-tindakan" class="detail-subpanel hidden space-y-4">
-                <div class="bg-white rounded-2xl p-4 border border-slate-200/70 space-y-3">
-                  <p class="text-[11px] font-bold text-slate-500 uppercase">Quick Chips Tindakan / Lab:</p>
-                  <div class="flex flex-wrap gap-1.5">
-                    <button type="button" onclick="setTindakanChip('GDP/2 JPP')" class="px-3 py-1 rounded-full bg-royal-50 hover:bg-royal-600 hover:text-white text-royal-700 text-xs font-bold transition">+ GDP/2 JPP</button>
-                    <button type="button" onclick="setTindakanChip('Lipid Profil')" class="px-3 py-1 rounded-full bg-royal-50 hover:bg-royal-600 hover:text-white text-royal-700 text-xs font-bold transition">+ Lipid Profil</button>
-                    <button type="button" onclick="setTindakanChip('Darah Lengkap')" class="px-3 py-1 rounded-full bg-royal-50 hover:bg-royal-600 hover:text-white text-royal-700 text-xs font-bold transition">+ Darah Lengkap</button>
-                    <button type="button" onclick="setTindakanChip('EKG')" class="px-3 py-1 rounded-full bg-royal-50 hover:bg-royal-600 hover:text-white text-royal-700 text-xs font-bold transition">+ EKG</button>
-                    <button type="button" onclick="setTindakanChip('Rontgen Thorax')" class="px-3 py-1 rounded-full bg-royal-50 hover:bg-royal-600 hover:text-white text-royal-700 text-xs font-bold transition">+ Rontgen Thorax</button>
-                    <button type="button" onclick="setTindakanChip('GDS')" class="px-3 py-1 rounded-full bg-royal-50 hover:bg-royal-600 hover:text-white text-royal-700 text-xs font-bold transition">+ GDS</button>
-                    <button type="button" onclick="setTindakanChip('Cek Elektrolit')" class="px-3 py-1 rounded-full bg-royal-50 hover:bg-royal-600 hover:text-white text-royal-700 text-xs font-bold transition">+ Cek Elektrolit</button>
-                  </div>
-
-                  <form onsubmit="handleAddTindakan(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 pt-1">
-                    <input type="text" id="in-tindakan-judul" required placeholder="Tulis tindakan / pemeriksaan lab..." class="sm:col-span-6 px-3.5 py-2.5 rounded-xl bg-[#f3f6fb] text-sm outline-none focus:bg-white focus:border focus:border-royal-400" />
-                    <input type="text" id="in-tindakan-jam" placeholder="Jadwal / Jam (Misal: Besok 07:00)" class="sm:col-span-4 px-3.5 py-2.5 rounded-xl bg-[#f3f6fb] text-sm outline-none focus:bg-white focus:border focus:border-royal-400" />
-                    <button type="submit" class="sm:col-span-2 py-2.5 rounded-xl bg-royal-600 hover:bg-royal-700 text-white text-xs font-bold transition">Simpan</button>
-                  </form>
-                </div>
-                <div id="detail-tindakan-list" class="bg-white rounded-2xl border border-slate-200/70 divide-y divide-slate-100"></div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ==================== PAGE 2: BALANCE CAIRAN ==================== -->
-        <section id="page-balance" class="page-section hidden space-y-6">
-          <h2 class="text-2xl font-extrabold text-royal-800 tracking-tight">Balance Cairan</h2>
-
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <form onsubmit="handleSaveBalance(event)" class="lg:col-span-5 bg-[#f7f9fd] rounded-3xl p-5 border border-slate-200/70 space-y-4 h-fit">
-              <h3 class="font-bold text-royal-900 text-sm pb-2 border-b border-slate-200/70">Input & Hitung Balance Cairan</h3>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Pilih Pasien</label>
-                <select id="bal-patient-select" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-bold text-royal-900 outline-none"></select>
-              </div>
-
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1">Tanggal</label>
-                  <input type="date" id="bal-date" required class="w-full px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-sm outline-none" />
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1">Shift</label>
-                  <select id="bal-shift" class="w-full px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-semibold outline-none">
-                    <option value="Pagi">Pagi</option>
-                    <option value="Siang">Siang</option>
-                    <option value="Malam">Malam</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1">Sisa Infus (ml)</label>
-                  <input type="number" id="bal-sisa" min="0" value="0" oninput="calcBalanceLive()" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-bold outline-none" />
-                  <p class="text-[10px] text-slate-400 mt-0.5">Untuk operan shift</p>
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-emerald-700 mb-1">Infus Masuk (ml)</label>
-                  <input type="number" id="bal-infus" min="0" value="0" oninput="calcBalanceLive()" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-emerald-200 text-sm font-bold outline-none" />
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-emerald-700 mb-1">Makan / Minum (ml)</label>
-                  <input type="number" id="bal-oral" min="0" value="0" oninput="calcBalanceLive()" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-emerald-200 text-sm font-bold outline-none" />
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-amber-700 mb-1">Urin (ml)</label>
-                  <input type="number" id="bal-urin" min="0" value="0" oninput="calcBalanceLive()" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-amber-200 text-sm font-bold outline-none" />
-                </div>
-                <div class="col-span-2">
-                  <label class="block text-xs font-bold text-amber-700 mb-1">IWL Opsional (ml)</label>
-                  <input type="number" id="bal-iwl" min="0" value="0" oninput="calcBalanceLive()" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-amber-200 text-sm font-bold outline-none" />
-                </div>
-                <div class="col-span-2">
-                  <label class="block text-xs font-bold text-slate-600 mb-1">Catatan (Opsional)</label>
-                  <input type="text" id="bal-catatan" placeholder="Misal: Terpasang DC, urin jernih" class="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-sm outline-none" />
-                </div>
-              </div>
-
-              <!-- Live Calculation Result -->
-              <div class="rounded-2xl bg-white border border-slate-200 p-4 space-y-2">
-                <div class="flex justify-between text-xs font-semibold text-slate-600">
-                  <span>Total Masuk (Infus + Makan/Minum)</span>
-                  <span id="bal-live-in" class="text-emerald-700 font-bold">0 ml</span>
-                </div>
-                <div class="flex justify-between text-xs font-semibold text-slate-600">
-                  <span>Total Keluar (Urin + IWL)</span>
-                  <span id="bal-live-out" class="text-amber-700 font-bold">0 ml</span>
-                </div>
-                <div class="flex justify-between text-xs font-semibold text-slate-500">
-                  <span>Sisa Infus (Operan)</span>
-                  <span id="bal-live-sisa" class="font-bold">0 ml</span>
-                </div>
-                <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between">
-                  <span class="text-sm font-extrabold text-royal-900">Balance Cairan</span>
-                  <span id="bal-live-result" class="text-xl font-extrabold text-royal-600">0 ml</span>
-                </div>
-              </div>
-
-              <button type="submit" class="w-full py-3 rounded-full bg-royal-600 hover:bg-royal-700 text-white text-sm font-bold shadow-md transition">
-                Simpan Balance Cairan
-              </button>
-            </form>
-
-            <!-- History Table -->
-            <div class="lg:col-span-7 space-y-3">
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <h3 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-[0.14em]">Riwayat Balance Cairan</h3>
-                <select id="bal-filter-patient" onchange="renderBalanceHistory()" class="px-3.5 py-2 rounded-full border border-slate-200 text-xs font-bold bg-[#f3f6fb] text-royal-900 outline-none">
-                  <option value="ALL">Semua Pasien</option>
-                </select>
-              </div>
-              <div class="overflow-x-auto bg-white rounded-3xl border border-slate-200/70 p-3">
-                <table class="w-full text-left drive-table min-w-[560px]">
-                  <thead>
-                    <tr class="text-[11px] font-bold text-slate-400 uppercase">
-                      <th class="py-2 px-3">Pasien & Shift</th>
-                      <th class="py-2 px-3">Masuk</th>
-                      <th class="py-2 px-3">Keluar</th>
-                      <th class="py-2 px-3">Sisa Infus</th>
-                      <th class="py-2 px-3">Balance</th>
-                      <th class="py-2 px-3 text-right">Hapus</th>
-                    </tr>
-                  </thead>
-                  <tbody id="balance-history-tbody" class="text-xs sm:text-sm"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ==================== PAGE 3: VASCON & DOBUTAMIN ==================== -->
-        <section id="page-vascon" class="page-section hidden space-y-6">
-          <h2 class="text-2xl font-extrabold text-royal-800 tracking-tight">Kalkulator & Pantauan Vascon / Dobutamin</h2>
-
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Calculator Settings -->
-            <div class="lg:col-span-5 bg-[#f7f9fd] rounded-3xl p-5 border border-slate-200/70 space-y-4 h-fit">
-              <h3 class="font-bold text-royal-900 text-sm pb-2 border-b border-slate-200/70">Pengaturan Syringe Pump</h3>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Pilih Pasien (Otomatis Isi BB)</label>
-                <select id="vaso-patient-select" onchange="onSelectVasoPatient()" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-bold text-royal-900 outline-none"></select>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2.5">
-                <button type="button" id="btn-drug-vascon" onclick="selectVasoDrug('Vascon')" class="py-2.5 px-3 rounded-xl border-2 text-sm font-bold transition">Vascon</button>
-                <button type="button" id="btn-drug-dobutamin" onclick="selectVasoDrug('Dobutamin')" class="py-2.5 px-3 rounded-xl border-2 text-sm font-bold transition">Dobutamin</button>
-              </div>
-
-              <div class="grid grid-cols-3 gap-3">
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1">BB (kg)</label>
-                  <input type="number" id="vaso-bb" value="60" min="1" step="0.5" oninput="renderVasoTable()" class="w-full px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-bold outline-none" />
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1">Sediaan (mg)</label>
-                  <input type="number" id="vaso-sediaan" value="4" min="0.1" step="0.5" oninput="renderVasoTable()" class="w-full px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-bold outline-none" />
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1">Pengencer (ml)</label>
-                  <input type="number" id="vaso-vol" value="50" min="1" step="1" oninput="renderVasoTable()" class="w-full px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-bold outline-none" />
-                </div>
-              </div>
-
-              <div class="bg-white rounded-xl p-3 border border-slate-200 flex items-center justify-between text-xs">
-                <span class="text-slate-500 font-semibold">Konsentrasi Larutan:</span>
-                <span id="vaso-conc-label" class="font-extrabold text-royal-700 font-mono">80 mcg/ml</span>
-              </div>
-
-              <div class="rounded-2xl bg-gradient-to-br from-[#2563c9] to-[#3574e2] text-white p-4 shadow-lg shadow-royal-600/20">
-                <div class="flex items-center justify-between">
-                  <span class="text-[11px] font-bold text-blue-200 uppercase">Dosis Aktif Saat Ini</span>
-                  <span id="vaso-active-drug-badge" class="text-[11px] font-bold bg-white/20 px-2.5 py-0.5 rounded-full">Vascon</span>
-                </div>
-                <div class="mt-2 flex items-baseline justify-between">
-                  <p id="vaso-active-dose-text" class="text-2xl font-extrabold">0.05 <span class="text-xs font-medium text-blue-100">mcg/kg/mnt</span></p>
-                  <p id="vaso-active-rate-text" class="text-2xl font-extrabold text-amber-300">2.25 <span class="text-xs font-medium text-amber-100">ml/jam</span></p>
-                </div>
-              </div>
-
-              <button type="button" onclick="handleSaveVaso()" class="w-full py-3 rounded-full bg-royal-600 hover:bg-royal-700 text-white text-sm font-bold shadow-md transition">
-                Simpan ke Pantauan Vasoaktif
-              </button>
-            </div>
-
-            <!-- Auto Dose Table -->
-            <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 overflow-hidden flex flex-col">
-              <div class="px-5 py-4 bg-[#f7f9fd] border-b border-slate-100">
-                <h3 id="vaso-table-title" class="font-bold text-royal-900 text-sm">Tabel Pemberian Dosis Awal Vascon (Norepinephrine)</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Klik baris untuk menandai <strong>Dosis Aktif Saat Ini</strong>.</p>
-              </div>
-              <div class="overflow-x-auto flex-1 p-2">
-                <table class="w-full text-left drive-table">
-                  <thead>
-                    <tr class="text-[11px] font-bold text-slate-400 uppercase">
-                      <th class="py-2.5 px-4">Dosis (mcg/kg/menit)</th>
-                      <th class="py-2.5 px-4">Kecepatan (ml/jam)</th>
-                      <th class="py-2.5 px-4 text-right">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody id="vaso-dose-tbody" class="text-sm"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- Active Vasoaktif List -->
-          <div>
-            <h3 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-[0.14em] mb-3">Pasien Aktif Mendapat Vascon / Dobutamin</h3>
-            <div id="active-vaso-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
-          </div>
-        </section>
-
-        <!-- ==================== PAGE 4: REKAP & CETAK OBAT ==================== -->
-        <section id="page-recap" class="page-section hidden space-y-5">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 no-print">
-            <h2 class="text-2xl font-extrabold text-royal-800 tracking-tight">Rekap & Cetak Obat Keseluruhan</h2>
-            <button onclick="window.print()" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-royal-600 hover:bg-royal-700 text-white text-sm font-bold shadow-md transition">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659"/></svg>
-              <span>Cetak Rekap / Simpan PDF</span>
-            </button>
-          </div>
-
-          <div class="bg-[#f3f6fb] rounded-2xl p-3.5 flex flex-wrap items-center gap-3 no-print">
-            <div class="flex items-center gap-2">
-              <label class="text-xs font-bold text-slate-600">Pasien:</label>
-              <select id="recap-filter-patient" onchange="renderRecapTable()" class="px-3.5 py-2 rounded-full border border-slate-200 text-xs sm:text-sm font-bold bg-white text-royal-900 outline-none">
-                <option value="ALL">Semua Pasien</option>
-              </select>
-            </div>
-            <div class="flex items-center gap-2">
-              <label class="text-xs font-bold text-slate-600">Shift:</label>
-              <select id="recap-filter-shift" onchange="renderRecapTable()" class="px-3.5 py-2 rounded-full border border-slate-200 text-xs sm:text-sm font-bold bg-white text-royal-900 outline-none">
-                <option value="ALL">Semua Shift (Pagi, Siang, Malam)</option>
-                <option value="pagi">Hanya Shift Pagi</option>
-                <option value="siang">Hanya Shift Siang</option>
-                <option value="malam">Hanya Shift Malam</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6">
-            <div class="border-b-2 border-royal-900 pb-4 mb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-2">
-              <div>
-                <p class="text-[11px] font-extrabold text-royal-600 uppercase tracking-widest">Dokumen Resmi Keperawatan</p>
-                <h3 class="text-lg sm:text-xl font-extrabold text-slate-900">KARDEK PEMBERIAN OBAT - RUANG DAHLIA</h3>
-                <p class="text-xs text-slate-500">Rekap Jadwal Obat (Pagi/Siang/Malam), Antibiotik, Transfusi Darah & Tindakan</p>
-              </div>
-              <div class="text-left sm:text-right text-xs text-slate-600 space-y-0.5">
-                <p>Tanggal: <strong id="print-date-now" class="text-slate-900">-</strong></p>
-                <p>Perawat: <strong id="print-nurse-now" class="text-slate-900">-</strong></p>
-              </div>
-            </div>
-
-            <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse print-table">
-                <thead>
-                  <tr class="bg-[#eef4fc] text-[11px] font-extrabold text-royal-900 uppercase border-y border-slate-300">
-                    <th class="py-3 px-3 w-10 text-center">No</th>
-                    <th class="py-3 px-3 min-w-[160px]">Pasien / RM / Bed / DPJP</th>
-                    <th class="py-3 px-3 min-w-[190px]">Daftar Obat & Antibiotik</th>
-                    <th class="py-3 px-3 text-center w-20">Pagi</th>
-                    <th class="py-3 px-3 text-center w-20">Siang</th>
-                    <th class="py-3 px-3 text-center w-20">Malam</th>
-                    <th class="py-3 px-3 min-w-[170px]">Transfusi & Tindakan</th>
-                  </tr>
-                </thead>
-                <tbody id="recap-tbody" class="divide-y divide-slate-200 text-xs sm:text-sm"></tbody>
-              </table>
-            </div>
-
-            <!-- Signature Block (Print Only) -->
-            <div class="hidden print-only mt-10 pt-4">
-              <div class="grid grid-cols-2 gap-8 text-center text-xs">
-                <div>
-                  <p class="text-slate-600">Mengetahui,</p>
-                  <p class="font-bold text-slate-900">Kepala Ruang Dahlia</p>
-                  <div class="h-16"></div>
-                  <p class="font-bold underline">( ................................................ )</p>
-                </div>
-                <div>
-                  <p class="text-slate-600">Ruang Dahlia, <span id="print-sign-date"></span></p>
-                  <p class="font-bold text-slate-900">Perawat Jaga</p>
-                  <div class="h-16"></div>
-                  <p id="print-sign-nurse" class="font-bold underline">( Perawat Jaga )</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ==================== PAGE 5: PENGATURAN DATABASE & SYNC ==================== -->
-        <section id="page-database" class="page-section hidden space-y-6">
-          <h2 class="text-2xl font-extrabold text-royal-800 tracking-tight">Pengaturan Database Supabase</h2>
-
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-6 bg-[#f7f9fd] rounded-3xl p-5 border border-slate-200/70 space-y-4 h-fit">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-200/70">
-                <h3 class="font-bold text-royal-900 text-sm">Status Koneksi Saat Ini</h3>
-                <span id="db-page-status-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
-                  <span class="w-2 h-2 rounded-full bg-amber-500"></span> Mode Lokal
-                </span>
-              </div>
-
-              <form onsubmit="handleConnectSupabaseFromPage(event)" class="space-y-3.5">
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Supabase Project URL</label>
-                  <input type="url" id="sb-page-url" required
-                    class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm font-mono outline-none focus:border-royal-500" />
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Supabase Anon / Publishable Key</label>
-                  <textarea id="sb-page-key" rows="3" required
-                    class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-mono outline-none focus:border-royal-500"></textarea>
-                </div>
-                <div class="flex flex-wrap gap-2 pt-1">
-                  <button type="submit" class="flex-1 py-2.5 px-4 rounded-full bg-royal-600 hover:bg-royal-700 text-white text-xs font-bold shadow-sm transition">
-                    Simpan & Uji Koneksi
-                  </button>
-                  <button type="button" onclick="disconnectSupabase()" class="py-2.5 px-4 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold transition">
-                    Mode Lokal
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            <div class="lg:col-span-6 bg-white rounded-3xl border border-slate-200/80 p-5 space-y-3 h-fit">
-              <h3 class="font-bold text-royal-900 text-sm">Informasi Sinkronisasi Ruang Dahlia</h3>
-              <ul class="text-xs text-slate-600 space-y-2 list-disc pl-4 leading-relaxed">
-                <li><strong>Terhubung Otomatis:</strong> Project URL dan API Key Supabase Ruang Dahlia sudah ditanam langsung di dalam file <code class="bg-slate-100 px-1.5 py-0.5 rounded">index.html</code>.</li>
-                <li><strong>Realtime Sync:</strong> Perubahan data pasien, obat, balance cairan, dan titrasi Vascon/Dobutamin dari satu HP perawat akan langsung muncul di HP perawat lain.</li>
-                <li><strong>Cadangan Lokal:</strong> Jika jaringan internet terputus, aplikasi tetap dapat digunakan dengan penyimpanan sementara browser (<code class="bg-slate-100 px-1.5 py-0.5 rounded">localStorage</code>).</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-      </main>
-    </div>
-  </div>
-
-  <!-- ==================== MODAL TAMBAH / EDIT PASIEN ==================== -->
-  <div id="patient-modal" class="fixed inset-0 z-[65] hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-3 sm:p-4 no-print">
-    <div class="bg-white rounded-[28px] shadow-2xl max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-100">
-      <!-- Header -->
-      <div class="px-6 pt-6 pb-3 flex items-center justify-between shrink-0">
-        <h3 id="patient-modal-title" class="font-extrabold text-xl text-royal-600 tracking-tight">Data pasien</h3>
-        <button type="button" onclick="closePatientModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-      </div>
-
-      <!-- Scrollable Form Body -->
-      <form onsubmit="handleSavePatient(event)" class="px-6 pb-6 overflow-y-auto space-y-4">
-        <input type="hidden" id="edit-patient-id" />
-
-        <!-- Nama Pasien -->
-        <div>
-          <label class="block text-xs font-bold text-slate-500 mb-1.5">Nama pasien</label>
-          <input type="text" id="p-nama" required placeholder="Masukkan nama lengkap pasien"
-            class="w-full px-4 py-3 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 focus:ring-2 focus:ring-royal-100 text-sm font-medium text-slate-800 outline-none transition" />
-        </div>
-
-        <!-- Kamar & Dokter -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1.5">Kamar</label>
-            <select id="p-bed" required
-              class="w-full px-4 py-3 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-semibold text-slate-800 outline-none transition">
-              <option value="">Pilih kamar</option>
-              <option value="Kamar 1 - Bed 1">Kamar 1 - Bed 1</option>
-              <option value="Kamar 1 - Bed 2">Kamar 1 - Bed 2</option>
-              <option value="Kamar 2 - Bed 1">Kamar 2 - Bed 1</option>
-              <option value="Kamar 2 - Bed 2">Kamar 2 - Bed 2</option>
-              <option value="Kamar 3 - Bed 1">Kamar 3 - Bed 1</option>
-              <option value="Kamar 3 - Bed 2">Kamar 3 - Bed 2</option>
-              <option value="Kamar 4 - Bed 1">Kamar 4 - Bed 1</option>
-              <option value="Kamar 4 - Bed 2">Kamar 4 - Bed 2</option>
-              <option value="Kamar 5 - Bed 1">Kamar 5 - Bed 1</option>
-              <option value="Kamar 5 - Bed 2">Kamar 5 - Bed 2</option>
-              <option value="Kamar 6 - Bed 1">Kamar 6 - Bed 1</option>
-              <option value="Kamar 6 - Bed 2">Kamar 6 - Bed 2</option>
-              <option value="Kamar 7 (VIP)">Kamar 7 (VIP)</option>
-              <option value="Kamar 8 (VIP)">Kamar 8 (VIP)</option>
-              <option value="Isolasi 1">Isolasi 1</option>
-              <option value="Isolasi 2">Isolasi 2</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1.5">Dokter</label>
-            <input type="text" id="p-dpjp" required placeholder="Nama DPJP"
-              class="w-full px-4 py-3 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 focus:ring-2 focus:ring-royal-100 text-sm font-medium text-slate-800 outline-none transition" />
-          </div>
-        </div>
-
-        <!-- Info Tambahan Opsional (No RM, Kelas, BB, Diagnosa) -->
-        <details class="group rounded-2xl bg-[#f8fafc] border border-slate-200/70 px-4 py-2.5">
-          <summary class="text-xs font-bold text-slate-500 cursor-pointer select-none flex items-center justify-between">
-            <span>Info Tambahan (No. RM, Kelas, BB, Diagnosa)</span>
-            <span class="text-[11px] text-royal-600 group-open:hidden">+ Isi Opsional</span>
-          </summary>
-          <div class="grid grid-cols-3 gap-2.5 pt-3 pb-1">
-            <div>
-              <label class="block text-[11px] font-bold text-slate-500 mb-1">No. RM</label>
-              <input type="text" id="p-norm" placeholder="RM-00123" class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono outline-none" />
-            </div>
-            <div>
-              <label class="block text-[11px] font-bold text-slate-500 mb-1">Kelas</label>
-              <select id="p-kelas" class="w-full px-2.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-semibold outline-none">
-                <option value="Kelas 1">Kelas 1</option>
-                <option value="VIP">VIP</option>
-                <option value="Kelas 2">Kelas 2</option>
-                <option value="Kelas 3">Kelas 3</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-[11px] font-bold text-slate-500 mb-1">BB (kg)</label>
-              <input type="number" id="p-bb" min="1" step="0.5" value="60" class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold outline-none" />
-            </div>
-            <div class="col-span-3">
-              <label class="block text-[11px] font-bold text-slate-500 mb-1">Diagnosa Medis</label>
-              <input type="text" id="p-diagnosa" placeholder="Contoh: CHF NYHA III + Hipotensi" class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs outline-none" />
-            </div>
-          </div>
-        </details>
-
+<!-- ... existing code ... -->
         <!-- Dynamic Obat List -->
         <div class="space-y-2.5">
           <label class="block text-xs font-bold text-slate-500">Obat</label>
@@ -1161,921 +10,193 @@
           </button>
         </div>
 
+        <!-- Dynamic Infus List -->
+        <div class="space-y-2.5 pt-1">
+          <label class="block text-xs font-bold text-slate-500">Infus / Cairan Intravena</label>
+          <div id="modal-infus-container" class="space-y-3"></div>
+
+          <button type="button" onclick="addModalInfusRow()"
+            class="px-5 py-2.5 rounded-full bg-sky-100 hover:bg-sky-200 text-sky-700 text-xs font-bold transition inline-flex items-center gap-1.5">
+            <span>+ Tambah infus</span>
+          </button>
+        </div>
+
         <!-- Rencana Tindakan -->
         <div class="pt-1">
-          <label class="block text-xs font-bold text-slate-500 mb-1.5">Rencana tindakan (satu tindakan per baris, otomatis jadi ceklis)</label>
-          <textarea id="p-rencana-tindakan" rows="3"
-            placeholder="Contoh:&#10;Observasi TTV tiap 4 jam&#10;Ganti balutan luka"
-            class="w-full px-4 py-3 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 focus:ring-2 focus:ring-royal-100 text-sm text-slate-800 outline-none transition"></textarea>
-        </div>
-
-        <!-- Bottom Action Buttons -->
-        <div class="pt-2 flex justify-end gap-2.5">
-          <button type="button" onclick="closePatientModal()"
-            class="px-6 py-2.5 rounded-full text-sm font-bold text-royal-700 bg-royal-100 hover:bg-royal-200 transition">
-            Batal
-          </button>
-          <button type="submit"
-            class="px-7 py-2.5 rounded-full text-sm font-bold text-white bg-royal-600 hover:bg-royal-700 shadow-md shadow-royal-600/25 transition">
-            Simpan
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ==================== APPLICATION SCRIPT ==================== -->
-  <script>
-    // =========================================================================
-    // 1. KONFIGURASI SUPABASE PERMANEN RUANG DAHLIA
-    // =========================================================================
-    const SUPABASE_URL = 'https://yobpddlzyojkusqbsoug.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_PIb2STopwtLOhNEuf_K5cw_V6_cK4nd';
-
-    const LOCAL_DB_KEY = 'kardek_dahlia_sb_fallback_v1';
-    const SESSION_KEY = 'kardek_dahlia_sb_session_v1';
-    const RUNTIME_SB_URL_KEY = 'kardek_dahlia_runtime_sb_url';
-    const RUNTIME_SB_KEY_KEY = 'kardek_dahlia_runtime_sb_key';
-    const TOTAL_ROOM_BEDS = 16;
-
-    const VASCON_DOSES = [0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.75, 1.0];
-    const DOBUTAMIN_DOSES = [2, 3, 5, 7.5, 10, 12.5, 15, 20];
-
-    const AVATAR_COLORS = [
-      'bg-amber-400 text-amber-950',
-      'bg-emerald-500 text-white',
-      'bg-rose-500 text-white',
-      'bg-sky-500 text-white',
-      'bg-violet-500 text-white',
-      'bg-orange-400 text-white'
-    ];
-
-    // =========================================================================
-    // 2. GLOBAL STATE
-    // =========================================================================
-    let supabaseClient = null;
-    let realtimeChannel = null;
-    let pollingInterval = null;
-    let isSupabaseOnline = false;
-
-    let currentUser = null;
-    let currentPage = 'dashboard';
-    let dashboardFilter = 'ALL';
-    let selectedPatientId = null;
-    let currentDetailTab = 'obat';
-    let currentVasoDrug = 'Vascon';
-    let currentVasoDose = 0.05;
-
-    let state = {
-      perawat: [],
-      pasien: [],
-      balance_cairan: [],
-      vasoaktif: []
-    };
-
-    // =========================================================================
-    // 3. HELPERS
-    // =========================================================================
-    function generateUUID() {
-      if (window.crypto && typeof window.crypto.randomUUID === 'function') {
-        return window.crypto.randomUUID();
-      }
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-        const r = Math.random() * 16 | 0;
-        const v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-      });
-    }
-
-    function getTodayISO() {
-      const now = new Date();
-      return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().split('T')[0];
-    }
-
-    function getNowTime() {
-      return new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-    }
-
-    function formatDateIndo(dateObj = new Date()) {
-      return dateObj.toLocaleDateString('id-ID', {
-        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-      });
-    }
-
-    function getInitials(name) {
-      if (!name) return '?';
-      const cleaned = name.replace(/^(Tn\.|Ny\.|Nn\.|An\.|Ns\.|dr\.)\s*/i, '').trim();
-      const parts = cleaned.split(/\s+/);
-      return ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase() || cleaned[0].toUpperCase();
-    }
-
-    function escapeHTML(str) {
-      if (str === null || str === undefined) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    // =========================================================================
-    // 4. DEFAULT LOCAL DATA (FALLBACK MODE)
-    // =========================================================================
-    function getDefaultLocalState() {
-      const today = getTodayISO();
-      const p1Id = generateUUID();
-      const p2Id = generateUUID();
-      return {
-        perawat: [
-          { id: generateUUID(), username: 'perawat1', password: '123456', nama: 'Ns. Rina, S.Kep', jabatan: 'Perawat Pelaksana', created_at: new Date().toISOString() },
-          { id: generateUUID(), username: 'karu', password: '123456', nama: 'Ns. Taslim Nur, S.Kep', jabatan: 'Kepala Ruangan', created_at: new Date().toISOString() }
-        ],
-        pasien: [
-          {
-            id: p1Id,
-            nama: 'Tn. Ahmad Suryadi',
-            no_rm: 'RM-20411',
-            bed: 'Bed 01',
-            kelas: 'Kelas 1',
-            dpjp: 'dr. Hendra Wijaya, Sp.PD',
-            diagnosa: 'Sepsis + Anemia Gravis',
-            bb: 65,
-            obat: [
-              { id: 'ob1', nama: 'Ceftriaxone', dosis: '1 gr IV', pagi: '09:00', siang: '', malam: '21:00', pagi_done: true, pagi_info: 'Ns. Rina (09:05)', siang_done: false, siang_info: '', malam_done: false, malam_info: '' }
-            ],
-            antibiotik: [{ id: 'ab1', nama: 'Ceftriaxone 1 gr IV', hari_ke: 3 }],
-            transfusi: [{ id: 'tf1', jenis: 'PRC', gol_darah: 'O+', kolf: 2, jam_masuk: '10:30', perawat: 'Ns. Rina, S.Kep' }],
-            tindakan: [{ id: 'td1', judul: 'GDP/2 JPP', jam: 'Besok 07:00', selesai: false, perawat: 'Ns. Rina, S.Kep' }],
-            updated_at: new Date().toISOString(),
-            created_at: new Date().toISOString()
-          },
-          {
-            id: p2Id,
-            nama: 'Ny. Siti Aminah',
-            no_rm: 'RM-20458',
-            bed: 'Bed 04',
-            kelas: 'VIP',
-            dpjp: 'dr. Ratna Dewi, Sp.JP',
-            diagnosa: 'CHF NYHA III + Hipotensi',
-            bb: 58,
-            obat: [
-              { id: 'ob2', nama: 'Furosemide', dosis: '20 mg IV', pagi: '09:00', siang: '17:00', malam: '', pagi_done: true, pagi_info: 'Ns. Rina (09:00)', siang_done: false, siang_info: '', malam_done: false, malam_info: '' }
-            ],
-            antibiotik: [],
-            transfusi: [],
-            tindakan: [{ id: 'td2', judul: 'EKG', jam: 'Hari ini 14:00', selesai: false, perawat: 'Ns. Rina, S.Kep' }],
-            updated_at: new Date().toISOString(),
-            created_at: new Date().toISOString()
-          }
-        ],
-        balance_cairan: [
-          {
-            id: generateUUID(), pasien_id: p2Id, nama_pasien: 'Ny. Siti Aminah', bed: 'Bed 04',
-            tanggal: today, shift: 'Pagi', sisa_infus: 250, infus_masuk: 500, makan_minum: 300,
-            urin: 950, iwl: 0, total_masuk: 800, total_keluar: 950, balance: -150,
-            perawat: 'Ns. Rina, S.Kep', catatan: 'Urin lancar via DC', created_at: new Date().toISOString()
-          }
-        ],
-        vasoaktif: [
-          {
-            id: generateUUID(), pasien_id: p2Id, nama_pasien: 'Ny. Siti Aminah', bed: 'Bed 04',
-            jenis_obat: 'Vascon', bb: 58, sediaan_mg: 4, pengencer_ml: 50,
-            dosis_aktif: 0.1, kecepatan_ml_jam: 4.35, perawat: 'Ns. Rina, S.Kep', updated_at: new Date().toISOString()
-          }
-        ]
-      };
-    }
-
-    function loadLocalState() {
-      try {
-        const raw = localStorage.getItem(LOCAL_DB_KEY);
-        if (raw) {
-          state = JSON.parse(raw);
-        } else {
-          state = getDefaultLocalState();
-          saveLocalState();
-        }
-      } catch (e) {
-        state = getDefaultLocalState();
-        saveLocalState();
-      }
-    }
-
-    function saveLocalState() {
-      try {
-        localStorage.setItem(LOCAL_DB_KEY, JSON.stringify(state));
-      } catch (e) {
-        console.error('LocalStorage save failed:', e);
-      }
-    }
-
-    // =========================================================================
-    // 5. SUPABASE INITIALIZATION, FETCH & REALTIME SYNC
-    // =========================================================================
-    function getEffectiveSupabaseCredentials() {
-      // Prioritaskan kredensial permanen yang sudah tertanam di kode jika valid
-      if (SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL.startsWith('https://')) {
-        return { url: SUPABASE_URL.trim(), key: SUPABASE_ANON_KEY.trim() };
-      }
-      const savedUrl = (localStorage.getItem(RUNTIME_SB_URL_KEY) || '').trim();
-      const savedKey = (localStorage.getItem(RUNTIME_SB_KEY_KEY) || '').trim();
-      if (savedUrl && savedKey) {
-        return { url: savedUrl, key: savedKey };
-      }
-      return null;
-    }
-
-    function updateConnectionUI(online) {
-      isSupabaseOnline = online;
-      const authBadge = document.getElementById('auth-conn-badge');
-      const headerBtn = document.getElementById('header-conn-btn');
-      const headerDot = document.getElementById('header-conn-dot');
-      const headerText = document.getElementById('header-conn-text');
-      const dbPageBadge = document.getElementById('db-page-status-badge');
-
-      if (online) {
-        authBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200';
-        authBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span>Supabase Online</span>';
-
-        headerBtn.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 transition';
-        headerDot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
-        headerText.textContent = 'Supabase Online';
-
-        dbPageBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800';
-        dbPageBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Supabase Online / Sinkron';
-      } else {
-        authBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200';
-        authBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-500"></span><span>Mode Lokal</span>';
-
-        headerBtn.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 transition';
-        headerDot.className = 'w-2 h-2 rounded-full bg-amber-500';
-        headerText.textContent = 'Mode Lokal';
-
-        dbPageBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800';
-        dbPageBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-500"></span> Mode Lokal (Cadangan)';
-      }
-
-      const creds = getEffectiveSupabaseCredentials();
-      if (creds) {
-        document.getElementById('sb-modal-url').value = creds.url;
-        document.getElementById('sb-modal-key').value = creds.key;
-        document.getElementById('sb-page-url').value = creds.url;
-        document.getElementById('sb-page-key').value = creds.key;
-      }
-    }
-
-    async function initSupabaseConnection(silent = true) {
-      const creds = getEffectiveSupabaseCredentials();
-      if (!creds) {
-        supabaseClient = null;
-        stopRealtimeSync();
-        updateConnectionUI(false);
-        loadLocalState();
-        return false;
-      }
-
-      if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-        supabaseClient = null;
-        stopRealtimeSync();
-        updateConnectionUI(false);
-        loadLocalState();
-        if (!silent) {
-          showToast('Library Supabase dari CDN gagal dimuat. Periksa koneksi internet atau refresh halaman.', 'error');
-        }
-        return false;
-      }
-
-      try {
-        supabaseClient = window.supabase.createClient(creds.url, creds.key, {
-          auth: { persistSession: false, autoRefreshToken: false }
-        });
-
-        const { error } = await supabaseClient.from('perawat').select('id').limit(1);
-        if (error) throw error;
-
-        updateConnectionUI(true);
-        await fetchAllFromSupabase(true);
-        startRealtimeSync();
-        if (!silent) showToast('Terhubung ke Supabase! Sinkronisasi Realtime aktif.');
-        return true;
-      } catch (err) {
-        console.error('Supabase connection error:', err);
-        supabaseClient = null;
-        stopRealtimeSync();
-        updateConnectionUI(false);
-        loadLocalState();
-        if (!silent) {
-          const detail = err?.message || err?.error_description || 'Periksa internet / Project Supabase';
-          showToast(`Gagal koneksi Supabase: ${detail}`, 'error');
-        }
-        return false;
-      }
-    }
-
-    async function fetchAllFromSupabase(silent = true) {
-      if (!isSupabaseOnline || !supabaseClient) return;
-      try {
-        const [resPerawat, resPasien, resBalance, resVaso] = await Promise.all([
-          supabaseClient.from('perawat').select('*').order('created_at', { ascending: true }),
-          supabaseClient.from('pasien').select('*').order('created_at', { ascending: false }),
-          supabaseClient.from('balance_cairan').select('*').order('created_at', { ascending: false }),
-          supabaseClient.from('vasoaktif').select('*').order('updated_at', { ascending: false })
-        ]);
-
-        if (resPerawat.error) throw resPerawat.error;
-        if (resPasien.error) throw resPasien.error;
-        if (resBalance.error) throw resBalance.error;
-        if (resVaso.error) throw resVaso.error;
-
-        state.perawat = resPerawat.data || [];
-        state.pasien = (resPasien.data || []).map(p => ({
-          ...p,
-          obat: Array.isArray(p.obat) ? p.obat : [],
-          antibiotik: Array.isArray(p.antibiotik) ? p.antibiotik : [],
-          transfusi: Array.isArray(p.transfusi) ? p.transfusi : [],
-          tindakan: Array.isArray(p.tindakan) ? p.tindakan : []
-        }));
-        state.balance_cairan = resBalance.data || [];
-        state.vasoaktif = resVaso.data || [];
-
-        if (currentUser) renderAll();
-        if (!silent) showToast('Data berhasil disinkronkan dari Supabase.');
-      } catch (err) {
-        console.error('Fetch Supabase error:', err);
-        showToast(`Gagal memuat data Supabase: ${err.message}`, 'error');
-      }
-    }
-
-    function stopRealtimeSync() {
-      if (realtimeChannel && supabaseClient) {
-        try {
-          supabaseClient.removeChannel(realtimeChannel);
-        } catch (e) {}
-      }
-      realtimeChannel = null;
-      if (pollingInterval) {
-        clearInterval(pollingInterval);
-        pollingInterval = null;
-      }
-    }
-
-    function startPollingFallback() {
-      if (pollingInterval) return;
-      // Fallback sinkronisasi berkala jika WebSocket diblokir oleh sandbox/iframe
-      pollingInterval = setInterval(() => {
-        if (isSupabaseOnline && document.visibilityState === 'visible') {
-          fetchAllFromSupabase(true);
-        }
-      }, 10000);
-    }
-
-    function startRealtimeSync() {
-      if (!supabaseClient) return;
-      stopRealtimeSync();
-
-      // Hindari membuka WebSocket langsung jika berjalan di dalam iframe sandboxed (seperti Canvas Preview)
-      const isInIframe = (() => {
-        try { return window.self !== window.top; } catch (e) { return true; }
-      })();
-
-      if (isInIframe) {
-        startPollingFallback();
-        return;
-      }
-
-      try {
-        realtimeChannel = supabaseClient
-          .channel('kardek-dahlia-realtime')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'pasien' }, () => {
-            fetchAllFromSupabase(true);
-          })
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'balance_cairan' }, () => {
-            fetchAllFromSupabase(true);
-          })
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'vasoaktif' }, () => {
-            fetchAllFromSupabase(true);
-          })
-          .subscribe((status) => {
-            if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
-              startPollingFallback();
-            }
-          });
-      } catch (err) {
-        console.warn('WebSocket tidak diizinkan di lingkungan ini, beralih ke auto-sync berkala:', err);
-        startPollingFallback();
-      }
-    }
-
-    async function manualRefreshData() {
-      const icon = document.getElementById('refresh-icon');
-      icon.classList.add('animate-spin');
-      if (isSupabaseOnline) {
-        await fetchAllFromSupabase(false);
-      } else {
-        const ok = await initSupabaseConnection(false);
-        if (!ok) {
-          loadLocalState();
-          renderAll();
-        }
-      }
-      setTimeout(() => icon.classList.remove('animate-spin'), 450);
-    }
-
-    function openSupabaseModal() {
-      const creds = getEffectiveSupabaseCredentials();
-      document.getElementById('sb-modal-url').value = creds ? creds.url : '';
-      document.getElementById('sb-modal-key').value = creds ? creds.key : '';
-      const modal = document.getElementById('supabase-modal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
-
-    function closeSupabaseModal() {
-      const modal = document.getElementById('supabase-modal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    async function handleConnectSupabaseFromModal(e) {
-      e.preventDefault();
-      const url = document.getElementById('sb-modal-url').value.trim();
-      const key = document.getElementById('sb-modal-key').value.trim();
-      localStorage.setItem(RUNTIME_SB_URL_KEY, url);
-      localStorage.setItem(RUNTIME_SB_KEY_KEY, key);
-      const ok = await initSupabaseConnection(false);
-      if (ok) closeSupabaseModal();
-    }
-
-    async function handleConnectSupabaseFromPage(e) {
-      e.preventDefault();
-      const url = document.getElementById('sb-page-url').value.trim();
-      const key = document.getElementById('sb-page-key').value.trim();
-      localStorage.setItem(RUNTIME_SB_URL_KEY, url);
-      localStorage.setItem(RUNTIME_SB_KEY_KEY, key);
-      await initSupabaseConnection(false);
-    }
-
-    function disconnectSupabase() {
-      supabaseClient = null;
-      stopRealtimeSync();
-      updateConnectionUI(false);
-      loadLocalState();
-      if (currentUser) renderAll();
-      closeSupabaseModal();
-      showToast('Beralih ke Mode Lokal sementara.', 'info');
-    }
-
-    // =========================================================================
-    // 6. UI UTILITIES (TOAST, CONFIRM, DRAWER)
-    // =========================================================================
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      const styles = {
-        success: 'bg-royal-600 text-white',
-        error: 'bg-rose-600 text-white',
-        info: 'bg-slate-800 text-white'
-      };
-      toast.className = `toast-enter pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl text-xs sm:text-sm font-semibold ${styles[type] || styles.success}`;
-      toast.innerHTML = `<span>${escapeHTML(message)}</span>`;
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(20px)';
-        toast.style.transition = 'all 0.25s ease';
-        setTimeout(() => toast.remove(), 250);
-      }, 3000);
-    }
-
-    let confirmCallback = null;
-    function showConfirmModal(title, message, onConfirm, okText = 'Ya, Lanjutkan') {
-      document.getElementById('confirm-title').textContent = title;
-      document.getElementById('confirm-message').textContent = message;
-      document.getElementById('confirm-ok-btn').textContent = okText;
-      confirmCallback = onConfirm;
-      const modal = document.getElementById('confirm-modal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
-
-    function closeConfirmModal() {
-      const modal = document.getElementById('confirm-modal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-      confirmCallback = null;
-    }
-
-    document.getElementById('confirm-cancel-btn').addEventListener('click', closeConfirmModal);
-    document.getElementById('confirm-ok-btn').addEventListener('click', () => {
-      if (typeof confirmCallback === 'function') confirmCallback();
-      closeConfirmModal();
-    });
-
-    function toggleMobileDrawer(open) {
-      const sidebar = document.getElementById('app-sidebar');
-      const backdrop = document.getElementById('mobile-drawer-backdrop');
-      if (open) {
-        sidebar.classList.remove('-translate-x-full');
-        backdrop.classList.remove('hidden');
-      } else {
-        sidebar.classList.add('-translate-x-full');
-        backdrop.classList.add('hidden');
-      }
-    }
-
-    // =========================================================================
-    // 7. AUTHENTICATION (PERAWAT)
-    // =========================================================================
-    function switchAuthTab(tab) {
-      const loginForm = document.getElementById('login-form');
-      const regForm = document.getElementById('register-form');
-      const loginBtn = document.getElementById('tab-login-btn');
-      const regBtn = document.getElementById('tab-register-btn');
-      if (tab === 'login') {
-        loginForm.classList.remove('hidden');
-        regForm.classList.add('hidden');
-        loginBtn.className = 'py-2 text-xs sm:text-sm font-bold rounded-full bg-royal-600 text-white shadow-sm transition';
-        regBtn.className = 'py-2 text-xs sm:text-sm font-semibold rounded-full text-slate-600 hover:text-royal-800 transition';
-      } else {
-        loginForm.classList.add('hidden');
-        regForm.classList.remove('hidden');
-        regBtn.className = 'py-2 text-xs sm:text-sm font-bold rounded-full bg-royal-600 text-white shadow-sm transition';
-        loginBtn.className = 'py-2 text-xs sm:text-sm font-semibold rounded-full text-slate-600 hover:text-royal-800 transition';
-      }
-    }
-
-    function fillDemoLogin(u, p) {
-      document.getElementById('login-username').value = u;
-      document.getElementById('login-password').value = p;
-      showToast(`Akun ${u} siap masuk.`, 'info');
-    }
-
-    async function handleLogin(e) {
-      e.preventDefault();
-      const username = document.getElementById('login-username').value.trim().toLowerCase();
-      const password = document.getElementById('login-password').value;
-
-      let user = null;
-      if (isSupabaseOnline && supabaseClient) {
-        try {
-          const { data, error } = await supabaseClient
-            .from('perawat')
-            .select('*')
-            .ilike('username', username)
-            .eq('password', password)
-            .maybeSingle();
-          if (error) throw error;
-          user = data;
-        } catch (err) {
-          return showToast(`Error login Supabase: ${err.message}`, 'error');
-        }
-      } else {
-        user = state.perawat.find(u => u.username.toLowerCase() === username && u.password === password);
-      }
-
-      if (!user) return showToast('Username atau password salah!', 'error');
-
-      saveSession(user);
-      await enterMainApp();
-      showToast(`Selamat bertugas, ${user.nama}!`);
-    }
-
-    async function handleRegister(e) {
-      e.preventDefault();
-      const nama = document.getElementById('reg-name').value.trim();
-      const username = document.getElementById('reg-username').value.trim().toLowerCase();
-      const jabatan = document.getElementById('reg-jabatan').value;
-      const password = document.getElementById('reg-password').value;
-
-      const newUser = { id: generateUUID(), username, password, nama, jabatan };
-
-      if (isSupabaseOnline && supabaseClient) {
-        try {
-          const { data, error } = await supabaseClient.from('perawat').insert([newUser]).select().single();
-          if (error) throw error;
-          saveSession(data);
-          showToast(`Akun ${nama} tersimpan di Supabase.`);
-        } catch (err) {
-          return showToast(`Gagal daftar di Supabase: ${err.message}`, 'error');
-        }
-      } else {
-        if (state.perawat.some(u => u.username.toLowerCase() === username)) {
-          return showToast('Username sudah terdaftar.', 'error');
-        }
-        state.perawat.push({ ...newUser, created_at: new Date().toISOString() });
-        saveLocalState();
-        saveSession(newUser);
-        showToast(`Akun ${nama} berhasil didaftarkan.`);
-      }
-
-      document.getElementById('register-form').reset();
-      await enterMainApp();
-    }
-
-    function saveSession(user) {
-      currentUser = user;
-      if (user) localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-      else localStorage.removeItem(SESSION_KEY);
-    }
-
-    function loadSession() {
-      try {
-        const raw = localStorage.getItem(SESSION_KEY);
-        if (raw) currentUser = JSON.parse(raw);
-      } catch (e) { currentUser = null; }
-    }
-
-    function handleLogout() {
-      showConfirmModal('Keluar / Ganti Perawat', 'Apakah Anda ingin keluar dari sesi perawat saat ini?', () => {
-        saveSession(null);
-        document.getElementById('app-frame').classList.add('hidden');
-        document.getElementById('auth-screen').classList.remove('hidden');
-        document.getElementById('login-form').reset();
-        toggleMobileDrawer(false);
-        showToast('Sesi berakhir.', 'info');
-      }, 'Keluar');
-    }
-
-    async function enterMainApp() {
-      document.getElementById('auth-screen').classList.add('hidden');
-      document.getElementById('app-frame').classList.remove('hidden');
-
-      document.getElementById('header-nurse-name').textContent = currentUser.nama;
-      document.getElementById('header-nurse-role').textContent = currentUser.jabatan || 'Perawat';
-      document.getElementById('header-nurse-avatar').textContent = getInitials(currentUser.nama);
-      document.getElementById('dashboard-date-label').textContent = formatDateIndo(new Date());
-      document.getElementById('bal-date').value = getTodayISO();
-
-      if (isSupabaseOnline) {
-        await fetchAllFromSupabase(true);
-      }
-      navigateTo('dashboard');
-    }
-
-    // =========================================================================
-    // 8. NAVIGATION & RENDER ORCHESTRATION
-    // =========================================================================
-    function navigateTo(page) {
-      currentPage = page;
-      document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden'));
-      const target = document.getElementById(`page-${page}`);
-      if (target) target.classList.remove('hidden');
-
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        if (btn.dataset.nav === page) {
-          btn.className = 'nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold bg-white/18 text-white shadow-sm transition';
-        } else {
-          btn.className = 'nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-blue-100/85 hover:bg-white/10 hover:text-white transition';
-        }
-      });
-
-      toggleMobileDrawer(false);
-      renderAll();
-      document.getElementById('main-scroll-area').scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function handleGlobalSearch() {
-      if (currentPage !== 'dashboard') navigateTo('dashboard');
-      else renderDashboard();
-    }
-
-    function renderAll() {
-      populatePatientDropdowns();
-      renderSidebarStats();
-      renderDashboard();
-      renderPatientDetailPanel();
-      renderBalanceHistory();
-      selectVasoDrug(currentVasoDrug, false);
-      renderActiveVasoList();
-      renderRecapTable();
-    }
-
-    function renderSidebarStats() {
-      const bedCount = state.pasien.length;
-      const bedPct = Math.min(100, Math.round((bedCount / TOTAL_ROOM_BEDS) * 100));
-      document.getElementById('sidebar-bed-bar').style.width = `${bedPct}%`;
-      document.getElementById('sidebar-bed-pct').textContent = `${bedPct}%`;
-      document.getElementById('sidebar-bed-text').textContent = `${bedCount} dari ${TOTAL_ROOM_BEDS} Bed terisi`;
-
-      let totalSched = 0;
-      let doneSched = 0;
-      state.pasien.forEach(p => {
-        (p.obat || []).forEach(o => {
-          ['pagi', 'siang', 'malam'].forEach(sh => {
-            if (o[sh] && o[sh].trim()) {
-              totalSched++;
-              if (o[`${sh}_done`]) doneSched++;
-            }
-          });
-        });
-      });
-      const medPct = totalSched > 0 ? Math.round((doneSched / totalSched) * 100) : 0;
-      document.getElementById('sidebar-med-bar').style.width = `${medPct}%`;
-      document.getElementById('sidebar-med-pct').textContent = `${medPct}%`;
-      document.getElementById('sidebar-med-text').textContent = `${doneSched} dari ${totalSched} jadwal diberikan`;
-    }
-
-    function populatePatientDropdowns() {
-      const configs = [
-        { id: 'bal-patient-select', all: false },
-        { id: 'vaso-patient-select', all: false },
-        { id: 'bal-filter-patient', all: true },
-        { id: 'recap-filter-patient', all: true }
-      ];
-      configs.forEach(({ id, all }) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        const prev = el.value;
-        el.innerHTML = all ? '<option value="ALL">Semua Pasien</option>' : '';
-        if (!all && state.pasien.length === 0) {
-          el.innerHTML = '<option value="">-- Belum ada pasien --</option>';
-        } else {
-          state.pasien.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p.id;
-            opt.textContent = `${p.nama} (${p.bed} • ${p.kelas})`;
-            el.appendChild(opt);
-          });
-        }
-        if (prev && [...el.options].some(o => o.value === prev)) el.value = prev;
-      });
-    }
-
-    function renderAvatarStack(list, ringClass) {
-      if (!list.length) return '<span class="text-[11px] opacity-60 italic">Belum ada</span>';
-      const shown = list.slice(0, 4).map((p, idx) => {
-        const clr = AVATAR_COLORS[idx % AVATAR_COLORS.length];
-        return `<span class="w-7 h-7 rounded-full ${clr} ring-2 ${ringClass} text-[10px] font-extrabold flex items-center justify-center" title="${escapeHTML(p.nama)}">${getInitials(p.nama)}</span>`;
-      }).join('');
-      const extra = list.length > 4
-        ? `<span class="w-7 h-7 rounded-full bg-slate-200 text-slate-700 ring-2 ${ringClass} text-[10px] font-bold flex items-center justify-center">+${list.length - 4}</span>`
-        : '';
-      return shown + extra;
-    }
-
-    function setDashboardFilter(filterKey) {
-      dashboardFilter = filterKey;
-      document.getElementById('clear-filter-btn').classList.toggle('hidden', filterKey === 'ALL');
-      renderDashboard();
-    }
-
+<!-- ... existing code ... -->
+            <!-- 3 Clinical Sub-Tabs -->
+            <div class="p-4 sm:p-5 space-y-5">
+              <div class="flex flex-wrap gap-2 bg-white p-1.5 rounded-2xl border border-slate-200/70">
+                <button onclick="switchDetailTab('obat')" data-dtab="obat" class="detail-tab flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition">
+                  Jadwal Obat
+                </button>
+                <button onclick="switchDetailTab('infus')" data-dtab="infus" class="detail-tab flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition">
+                  Infus Terpasang
+                </button>
+                <button onclick="switchDetailTab('abtf')" data-dtab="abtf" class="detail-tab flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition">
+                  Antibiotik & Transfusi
+                </button>
+                <button onclick="switchDetailTab('tindakan')" data-dtab="tindakan" class="detail-tab flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition">
+                  Tindakan / Lab
+                </button>
+              </div>
+
+              <!-- TAB 1: JADWAL OBAT -->
+<!-- ... existing code ... -->
+                    <tbody id="detail-obat-tbody" class="text-sm"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- TAB INFUS TERPASANG -->
+              <div id="detail-panel-infus" class="detail-subpanel hidden space-y-4">
+                <form onsubmit="handleAddInfus(event)" class="bg-white rounded-2xl p-4 border border-slate-200/70 space-y-3">
+                  <div class="flex items-center justify-between">
+                    <h4 class="font-bold text-sky-800 text-xs uppercase tracking-wider flex items-center gap-2">
+                      <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span> Pasang / Tambah Cairan Infus
+                    </h4>
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                    <div class="sm:col-span-4">
+                      <label class="block text-[11px] font-bold text-slate-600 mb-1">Jenis Cairan Infus</label>
+                      <input type="text" id="in-infus-cairan" list="infus-presets" required placeholder="Misal: RL 500 ml / NaCl 0.9%"
+                        class="w-full px-3 py-2 rounded-xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-sky-500 text-sm outline-none" />
+                      <datalist id="infus-presets">
+                        <option value="RL 500 ml"></option>
+                        <option value="NaCl 0.9% 500 ml"></option>
+                        <option value="Asering 500 ml"></option>
+                        <option value="D5% 500 ml"></option>
+                        <option value="D5 1/2 NS 500 ml"></option>
+                        <option value="KA-EN 3B 500 ml"></option>
+                        <option value="Futrolit 500 ml"></option>
+                      </datalist>
+                    </div>
+                    <div class="sm:col-span-3">
+                      <label class="block text-[11px] font-bold text-slate-600 mb-1">Tetesan / Kecepatan</label>
+                      <input type="text" id="in-infus-tetesan" required placeholder="20 tpm / 80 ml/jam"
+                        class="w-full px-3 py-2 rounded-xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-sky-500 text-sm outline-none" />
+                    </div>
+                    <div class="sm:col-span-2">
+                      <label class="block text-[11px] font-bold text-slate-600 mb-1">Kolf ke-</label>
+                      <input type="number" id="in-infus-kolf" min="1" value="1" required
+                        class="w-full px-3 py-2 rounded-xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-sky-500 text-sm font-bold outline-none" />
+                    </div>
+                    <div class="sm:col-span-3">
+                      <label class="block text-[11px] font-bold text-slate-600 mb-1">Jam Mulai / Ket.</label>
+                      <input type="text" id="in-infus-jam" placeholder="08:00 (Tangan Ka)"
+                        class="w-full px-3 py-2 rounded-xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-sky-500 text-sm outline-none" />
+                    </div>
+                  </div>
+                  <div class="flex justify-end">
+                    <button type="submit" class="px-5 py-2 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-sm transition">
+                      + Simpan Infus
+                    </button>
+                  </div>
+                </form>
+
+                <div id="detail-infus-list" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+              </div>
+
+              <!-- TAB 2: ANTIBIOTIK & TRANSFUSI -->
+<!-- ... existing code ... -->
+                    <th class="py-3 px-3 min-w-[160px]">Pasien / RM / Bed / DPJP</th>
+                    <th class="py-3 px-3 min-w-[190px]">Daftar Obat & Antibiotik</th>
+                    <th class="py-3 px-3 text-center w-20">Pagi</th>
+                    <th class="py-3 px-3 text-center w-20">Siang</th>
+                    <th class="py-3 px-3 text-center w-20">Malam</th>
+                    <th class="py-3 px-3 min-w-[190px]">Infus, Transfusi & Tindakan</th>
+                  </tr>
+                </thead>
+<!-- ... existing code ... -->
     // =========================================================================
     // 9. DASHBOARD & PASIEN CRUD (SUPABASE + LOCAL)
     // =========================================================================
-    function format4DigitTimes(rawStr) {
-      const digits = (rawStr || '').replace(/\D/g, '');
-      if (!digits) return '';
-      const chunks = [];
-      for (let i = 0; i < digits.length; i += 4) {
-        const part = digits.slice(i, i + 4);
-        if (part.length === 4) {
-          chunks.push(`${part.slice(0, 2)}:${part.slice(2, 4)}`);
-        } else if (part.length > 2) {
-          chunks.push(`${part.slice(0, 2)}:${part.slice(2)}`);
-        } else {
-          chunks.push(part);
-        }
-      }
-      return chunks.join(', ');
-    }
-
-    function handleModalTimeInput(inputEl, rowId, shift) {
-      const formatted = format4DigitTimes(inputEl.value);
-      inputEl.value = formatted;
-      const cb = document.getElementById(`cb-${shift}-${rowId}`);
-      if (cb) cb.checked = formatted.trim().length > 0;
-    }
-
-    function toggleModalShiftCheck(rowId, shift) {
-      const cb = document.getElementById(`cb-${shift}-${rowId}`);
-      const inp = document.getElementById(`in-${shift}-${rowId}`);
-      if (!cb || !inp) return;
-      if (cb.checked && !inp.value.trim()) {
-        const defaults = { pagi: '09:00', siang: '17:00', malam: '21:00' };
-        inp.value = defaults[shift] || '08:00';
-      } else if (!cb.checked) {
-        inp.value = '';
-      }
-    }
-
-    function toggleModalKpCheck(rowId) {
-      const cb = document.getElementById(`cb-kp-${rowId}`);
-      const shifts = ['pagi', 'siang', 'malam'];
-      shifts.forEach(sh => {
-        const scb = document.getElementById(`cb-${sh}-${rowId}`);
-        const sinp = document.getElementById(`in-${sh}-${rowId}`);
-        if (cb && cb.checked) {
-          if (scb) scb.checked = false;
-          if (sinp) sinp.value = sh === 'pagi' ? 'K/P' : '';
-        } else if (sinp && sinp.value === 'K/P') {
-          sinp.value = '';
+    function getPatientInfusList(p) {
+      // Simpan daftar infus secara aman di dalam field JSONB tindakan dengan prefix khusus '__INFUS__:'
+      // agar langsung sinkron dengan tabel Supabase tanpa perlu mengubah skema database SQL!
+      const rawList = Array.isArray(p.tindakan) ? p.tindakan : [];
+      const result = [];
+      rawList.forEach(item => {
+        if (item && typeof item.judul === 'string' && item.judul.startsWith('__INFUS__:')) {
+          try {
+            const parsed = JSON.parse(item.judul.slice(10));
+            result.push({
+              id: item.id,
+              cairan: parsed.cairan || 'RL 500 ml',
+              tetesan: parsed.tetesan || '20 tpm',
+              kolf_ke: Number(parsed.kolf_ke) || 1,
+              jam: item.jam || '',
+              aktif: !item.selesai,
+              perawat: item.perawat || ''
+            });
+          } catch (e) {}
         }
       });
+      return result;
     }
 
-    function addModalMedRow(medData = null) {
-      const container = document.getElementById('modal-meds-container');
-      const rowId = generateUUID();
-      const nama = medData ? (medData.nama || '') : '';
-      const rawDosis = medData ? (medData.dosis || '') : '';
-      const ruteList = ['Oral', 'IV', 'IM', 'SC', 'Drip', 'Inhalasi', 'Topikal'];
-      let detectedRute = 'Oral';
-      let cleanDosis = rawDosis;
-      for (const r of ruteList) {
-        const regex = new RegExp(`\\s*\\(${r}\\)$|\\s+${r}$`, 'i');
-        if (regex.test(rawDosis)) {
-          detectedRute = r;
-          cleanDosis = rawDosis.replace(regex, '').trim();
-          break;
-        }
-      }
-
-      const pagi = medData ? (medData.pagi || '') : '';
-      const siang = medData ? (medData.siang || '') : '';
-      const malam = medData ? (medData.malam || '') : '';
-      const isKp = Boolean(medData && (medData.is_kp || pagi === 'K/P'));
-      const isAb = Boolean(medData && medData.is_ab);
-      const abHari = medData && medData.hari_ke ? medData.hari_ke : 1;
-
-      const card = document.createElement('div');
-      card.id = `med-row-${rowId}`;
-      card.className = 'modal-med-item pl-3.5 border-l-[3px] border-royal-500 space-y-2.5 pb-3 border-b border-dashed border-slate-200';
-      card.dataset.rowId = rowId;
-
-      card.innerHTML = `
-        <div class="flex items-center gap-2">
-          <input type="text" data-field="nama" value="${escapeHTML(nama)}" placeholder="Nama obat"
-            class="flex-1 min-w-0 px-4 py-2.5 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-medium outline-none" />
-          <input type="text" data-field="dosis" value="${escapeHTML(cleanDosis)}" placeholder="Dosis"
-            class="w-28 sm:w-32 px-4 py-2.5 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-medium outline-none" />
-          <button type="button" onclick="removeModalMedRow('${rowId}')" title="Hapus obat ini"
-            class="w-10 h-10 rounded-full bg-royal-100 hover:bg-rose-100 text-royal-700 hover:text-rose-600 flex items-center justify-center shrink-0 transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-          </button>
-        </div>
-
-        <div>
-          <select data-field="rute"
-            class="w-full px-4 py-2.5 rounded-2xl bg-[#eef3fc] border border-royal-300 text-sm font-semibold text-slate-800 outline-none focus:border-royal-600">
-            ${ruteList.map(r => `<option value="${r}" ${r === detectedRute ? 'selected' : ''}>${r}</option>`).join('')}
-          </select>
-        </div>
-
-        <div class="space-y-2 pt-0.5">
-          <div class="flex items-center gap-3">
-            <label class="w-20 inline-flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
-              <input type="checkbox" id="cb-pagi-${rowId}" ${pagi && !isKp ? 'checked' : ''} onchange="toggleModalShiftCheck('${rowId}', 'pagi')" class="w-4 h-4 rounded border-slate-300 text-royal-600" />
-              <span>Pagi</span>
-            </label>
-            <input type="text" id="in-pagi-${rowId}" value="${escapeHTML(pagi)}" oninput="handleModalTimeInput(this, '${rowId}', 'pagi')" placeholder="Jam, mis. 09:00"
-              class="flex-1 px-4 py-2.5 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-mono outline-none" />
-          </div>
-
-          <div class="flex items-center gap-3">
-            <label class="w-20 inline-flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
-              <input type="checkbox" id="cb-siang-${rowId}" ${siang ? 'checked' : ''} onchange="toggleModalShiftCheck('${rowId}', 'siang')" class="w-4 h-4 rounded border-slate-300 text-royal-600" />
-              <span>Siang</span>
-            </label>
-            <input type="text" id="in-siang-${rowId}" value="${escapeHTML(siang)}" oninput="handleModalTimeInput(this, '${rowId}', 'siang')" placeholder="Jam, mis. 09:00"
-              class="flex-1 px-4 py-2.5 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-mono outline-none" />
-          </div>
-
-          <div class="flex items-center gap-3">
-            <label class="w-20 inline-flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
-              <input type="checkbox" id="cb-malam-${rowId}" ${malam ? 'checked' : ''} onchange="toggleModalShiftCheck('${rowId}', 'malam')" class="w-4 h-4 rounded border-slate-300 text-royal-600" />
-              <span>Malam</span>
-            </label>
-            <input type="text" id="in-malam-${rowId}" value="${escapeHTML(malam)}" oninput="handleModalTimeInput(this, '${rowId}', 'malam')" placeholder="Jam, mis. 09:00"
-              class="flex-1 px-4 py-2.5 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-mono outline-none" />
-          </div>
-        </div>
-
-        <p class="text-[11px] text-slate-400 leading-relaxed">
-          Ketik 4 angka per jam (0900 menjadi 09:00). Jam berikutnya langsung diteruskan: 09001700 menjadi 09:00, 17:00.
-        </p>
-
-        <div class="space-y-1.5 pt-0.5">
-          <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
-            <input type="checkbox" id="cb-kp-${rowId}" ${isKp ? 'checked' : ''} onchange="toggleModalKpCheck('${rowId}')" class="w-4 h-4 rounded border-slate-300 text-royal-600" />
-            <span>K/P (jika perlu)</span>
-          </label>
-          <div class="flex items-center gap-2.5 flex-wrap">
-            <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
-              <input type="checkbox" id="cb-ab-${rowId}" ${isAb ? 'checked' : ''} onchange="document.getElementById('ab-day-box-${rowId}').classList.toggle('hidden', !this.checked)" class="w-4 h-4 rounded border-slate-300 text-amber-600" />
-              <span>Antibiotik (hitung hari pemberian)</span>
-            </label>
-            <div id="ab-day-box-${rowId}" class="${isAb ? 'inline-flex' : 'hidden'} items-center gap-1.5 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-xl">
-              <span class="text-[11px] font-bold text-amber-800">Hari ke-</span>
-              <input type="number" id="in-ab-day-${rowId}" min="1" value="${abHari}" class="w-12 px-1.5 py-0.5 rounded bg-white border border-amber-300 text-xs font-bold text-center outline-none" />
-            </div>
-          </div>
-        </div>
-      `;
-
-      container.appendChild(card);
+    function getPatientRegularActions(p) {
+      return (Array.isArray(p.tindakan) ? p.tindakan : []).filter(
+        item => !(item && typeof item.judul === 'string' && item.judul.startsWith('__INFUS__:'))
+      );
     }
 
+    function buildInfusTindakanItem(infusObj) {
+      return {
+        id: infusObj.id || generateUUID(),
+        judul: '__INFUS__:' + JSON.stringify({
+          cairan: infusObj.cairan,
+          tetesan: infusObj.tetesan,
+          kolf_ke: Number(infusObj.kolf_ke) || 1
+        }),
+        jam: infusObj.jam || getNowTime(),
+        selesai: infusObj.aktif === false,
+        perawat: infusObj.perawat || (currentUser ? currentUser.nama : '')
+      };
+    }
+
+    function countPendingMedsForPatient(p) {
+<!-- ... existing code ... -->
+      tbody.innerHTML = filtered.map(p => {
+        const isSelected = p.id === selectedPatientId;
+        const pendingMeds = countPendingMedsForPatient(p);
+        const totalKolf = (p.transfusi || []).reduce((s, t) => s + Number(t.kolf || 0), 0);
+        const activeInfus = getPatientInfusList(p).filter(inf => inf.aktif);
+        const vaso = state.vasoaktif.find(v => v.pasien_id === p.id);
+
+        return `
+          <tr onclick="selectPatientDetail('${p.id}')" class="cursor-pointer ${isSelected ? 'row-selected' : ''}">
+            <td class="py-3.5 px-3">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl ${isSelected ? 'bg-royal-600 text-white' : 'bg-royal-50 text-royal-700'} flex items-center justify-center font-extrabold text-xs shrink-0">
+                  ${getInitials(p.nama)}
+                </div>
+                <div>
+                  <p class="font-bold text-slate-800">${escapeHTML(p.nama)}</p>
+                  <p class="text-[11px] text-slate-400 font-mono">${escapeHTML(p.no_rm || '-')} &bull; BB ${p.bb || 60} kg &bull; <span class="font-sans">${escapeHTML(p.diagnosa)}</span></p>
+                </div>
+              </div>
+            </td>
+            <td class="py-3.5 px-3">
+              <div class="flex items-center gap-1.5">
+                <span class="px-2 py-0.5 rounded-md bg-royal-50 text-royal-700 text-[11px] font-bold">${escapeHTML(p.bed)}</span>
+                <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[11px] font-semibold">${escapeHTML(p.kelas)}</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1">${escapeHTML(p.dpjp)}</p>
+            </td>
+            <td class="py-3.5 px-3">
+              <div class="flex flex-wrap gap-1.5">
+                <span class="px-2 py-0.5 rounded-md ${pendingMeds > 0 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-700'} text-[11px] font-bold">
+                  ${(p.obat || []).length} Obat ${pendingMeds > 0 ? `(${pendingMeds} blm)` : '✓'}
+                </span>
+                ${activeInfus.map(inf => `<span class="px-2 py-0.5 rounded-md bg-sky-100 text-sky-800 text-[11px] font-bold">Infus: ${escapeHTML(inf.cairan)} (${escapeHTML(inf.tetesan)})</span>`).join('')}
+                ${(p.antibiotik || []).map(a => `<span class="px-2 py-0.5 rounded-md bg-orange-100 text-orange-800 text-[11px] font-bold">AB H-${a.hari_ke}</span>`).join('')}
+                ${totalKolf > 0 ? `<span class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-700 text-[11px] font-bold">${totalKolf} Kolf</span>` : ''}
+                ${vaso ? `<span class="px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 text-[11px] font-bold">${escapeHTML(vaso.jenis_obat)} ${vaso.dosis_aktif}</span>` : ''}
+              </div>
+            </td>
+            <td class="py-3.5 px-3 text-right whitespace-nowrap" onclick="event.stopPropagation()">
+<!-- ... existing code ... -->
     function removeModalMedRow(rowId) {
       const container = document.getElementById('modal-meds-container');
       const el = document.getElementById(`med-row-${rowId}`);
@@ -2085,10 +206,48 @@
       }
     }
 
+    function addModalInfusRow(infusData = null) {
+      const container = document.getElementById('modal-infus-container');
+      const rowId = generateUUID();
+      const cairan = infusData ? (infusData.cairan || '') : '';
+      const tetesan = infusData ? (infusData.tetesan || '') : '';
+      const kolfKe = infusData && infusData.kolf_ke ? infusData.kolf_ke : 1;
+      const jam = infusData ? (infusData.jam || '') : '';
+
+      const row = document.createElement('div');
+      row.id = `infus-row-${rowId}`;
+      row.className = 'modal-infus-item pl-3.5 border-l-[3px] border-sky-500 space-y-2 pb-2.5 border-b border-dashed border-slate-200';
+      row.dataset.rowId = rowId;
+
+      row.innerHTML = `
+        <div class="flex items-center gap-2">
+          <input type="text" data-field="cairan" list="infus-presets" value="${escapeHTML(cairan)}" placeholder="Jenis cairan (mis. RL 500 ml)"
+            class="flex-1 min-w-0 px-4 py-2.5 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-sky-500 text-sm font-medium outline-none" />
+          <input type="text" data-field="tetesan" value="${escapeHTML(tetesan)}" placeholder="Tetesan (20 tpm)"
+            class="w-32 sm:w-36 px-3.5 py-2.5 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-sky-500 text-sm font-medium outline-none" />
+          <button type="button" onclick="document.getElementById('infus-row-${rowId}').remove()" title="Hapus infus"
+            class="w-10 h-10 rounded-full bg-sky-100 hover:bg-rose-100 text-sky-700 hover:text-rose-600 flex items-center justify-center shrink-0 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="flex items-center gap-2 bg-[#f1f3f6] px-3.5 py-2 rounded-2xl">
+            <span class="text-xs font-bold text-slate-500 whitespace-nowrap">Kolf ke-</span>
+            <input type="number" data-field="kolf_ke" min="1" value="${kolfKe}" class="w-full bg-transparent text-sm font-bold text-slate-800 outline-none" />
+          </div>
+          <input type="text" data-field="jam" value="${escapeHTML(jam)}" placeholder="Jam / Lokasi (mis. 08:00 Ka)"
+            class="px-4 py-2 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-sky-500 text-sm outline-none" />
+        </div>
+      `;
+      container.appendChild(row);
+    }
+
     function openPatientModal(patientId = null) {
       document.getElementById('edit-patient-id').value = patientId || '';
       const medsContainer = document.getElementById('modal-meds-container');
+      const infusContainer = document.getElementById('modal-infus-container');
       medsContainer.innerHTML = '';
+      infusContainer.innerHTML = '';
 
       if (patientId) {
         const p = state.pasien.find(x => x.id === patientId);
@@ -2125,7 +284,10 @@
           addModalMedRow();
         }
 
-        document.getElementById('p-rencana-tindakan').value = (p.tindakan || []).map(t => t.judul).join('\n');
+        const existingInfus = getPatientInfusList(p);
+        existingInfus.forEach(inf => addModalInfusRow(inf));
+
+        document.getElementById('p-rencana-tindakan').value = getPatientRegularActions(p).map(t => t.judul).join('\n');
       } else {
         document.getElementById('patient-modal-title').textContent = 'Data pasien';
         document.getElementById('p-nama').value = '';
@@ -2143,80 +305,32 @@
       m.classList.remove('hidden');
       m.classList.add('flex');
     }
-
-    function closePatientModal() {
-      const m = document.getElementById('patient-modal');
-      m.classList.add('hidden');
-      m.classList.remove('flex');
-    }
-
-    async function handleSavePatient(e) {
-      e.preventDefault();
-      const id = document.getElementById('edit-patient-id').value;
-      const existingPatient = id ? state.pasien.find(x => x.id === id) : null;
-
-      // Kumpulkan daftar obat dari modal
-      const collectedObat = [];
-      const collectedAntibiotik = [];
-
-      document.querySelectorAll('.modal-med-item').forEach(card => {
-        const rowId = card.dataset.rowId;
-        const nama = card.querySelector('[data-field="nama"]').value.trim();
-        if (!nama) return;
-
-        const dosisRaw = card.querySelector('[data-field="dosis"]').value.trim();
-        const rute = card.querySelector('[data-field="rute"]').value;
-        const dosisLabel = dosisRaw ? `${dosisRaw} (${rute})` : rute;
-
-        const isKp = document.getElementById(`cb-kp-${rowId}`)?.checked || false;
-        const isAb = document.getElementById(`cb-ab-${rowId}`)?.checked || false;
-        const abDay = parseInt(document.getElementById(`in-ab-day-${rowId}`)?.value, 10) || 1;
-
-        let pagi = document.getElementById(`in-pagi-${rowId}`)?.value.trim() || '';
-        let siang = document.getElementById(`in-siang-${rowId}`)?.value.trim() || '';
-        let malam = document.getElementById(`in-malam-${rowId}`)?.value.trim() || '';
-
-        if (isKp && !pagi && !siang && !malam) {
-          pagi = 'K/P';
-        }
-
-        const prevObat = existingPatient
-          ? (existingPatient.obat || []).find(o => o.nama.toLowerCase() === nama.toLowerCase())
-          : null;
-
-        collectedObat.push({
-          id: prevObat ? prevObat.id : generateUUID(),
-          nama,
-          dosis: dosisLabel,
-          pagi,
-          siang,
-          malam,
-          is_kp: isKp,
-          is_ab: isAb,
-          pagi_done: prevObat ? Boolean(prevObat.pagi_done) : false,
-          pagi_info: prevObat ? (prevObat.pagi_info || '') : '',
-          siang_done: prevObat ? Boolean(prevObat.siang_done) : false,
-          siang_info: prevObat ? (prevObat.siang_info || '') : '',
-          malam_done: prevObat ? Boolean(prevObat.malam_done) : false,
-          malam_info: prevObat ? (prevObat.malam_info || '') : ''
-        });
-
-        if (isAb) {
-          collectedAntibiotik.push({
-            id: generateUUID(),
-            nama: `${nama} ${dosisLabel}`.trim(),
-            hari_ke: abDay
-          });
-        }
+<!-- ... existing code ... -->
+      // Kumpulkan daftar infus dari modal
+      const collectedInfusItems = [];
+      document.querySelectorAll('.modal-infus-item').forEach(row => {
+        const cairan = row.querySelector('[data-field="cairan"]').value.trim();
+        if (!cairan) return;
+        const tetesan = row.querySelector('[data-field="tetesan"]').value.trim() || '20 tpm';
+        const kolf_ke = parseInt(row.querySelector('[data-field="kolf_ke"]').value, 10) || 1;
+        const jam = row.querySelector('[data-field="jam"]').value.trim() || getNowTime();
+        collectedInfusItems.push(buildInfusTindakanItem({
+          id: generateUUID(),
+          cairan,
+          tetesan,
+          kolf_ke,
+          jam,
+          aktif: true,
+          perawat: currentUser.nama
+        }));
       });
 
       // Kumpulkan rencana tindakan (satu baris = satu ceklis)
       const rawTindakan = document.getElementById('p-rencana-tindakan').value || '';
       const lines = rawTindakan.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const existingRegularActions = existingPatient ? getPatientRegularActions(existingPatient) : [];
       const collectedTindakan = lines.map(line => {
-        const prevTd = existingPatient
-          ? (existingPatient.tindakan || []).find(t => t.judul.toLowerCase() === line.toLowerCase())
-          : null;
+        const prevTd = existingRegularActions.find(t => t.judul.toLowerCase() === line.toLowerCase());
         return {
           id: prevTd ? prevTd.id : generateUUID(),
           judul: line,
@@ -2236,291 +350,54 @@
         diagnosa: document.getElementById('p-diagnosa').value.trim() || '-',
         obat: collectedObat,
         antibiotik: collectedAntibiotik,
-        tindakan: collectedTindakan,
+        tindakan: [...collectedInfusItems, ...collectedTindakan],
         updated_at: new Date().toISOString()
       };
-
-      if (id) {
-        if (isSupabaseOnline && supabaseClient) {
-          try {
-            const { error } = await supabaseClient.from('pasien').update(payload).eq('id', id);
-            if (error) throw error;
-            await fetchAllFromSupabase(true);
-            showToast(`Data ${payload.nama} diperbarui di Supabase.`);
-          } catch (err) {
-            return showToast(`Gagal update Supabase: ${err.message}`, 'error');
-          }
-        } else {
-          const idx = state.pasien.findIndex(x => x.id === id);
-          if (idx !== -1) state.pasien[idx] = { ...state.pasien[idx], ...payload };
-          saveLocalState();
-          renderAll();
-          showToast(`Data ${payload.nama} diperbarui.`);
-        }
+<!-- ... existing code ... -->
+      // 2. Infus Terpasang List
+      const infusListEl = document.getElementById('detail-infus-list');
+      const infusItems = getPatientInfusList(p);
+      if (infusItems.length === 0) {
+        infusListEl.innerHTML = `<div class="col-span-full bg-white rounded-2xl border border-slate-200/70 p-6 text-center text-xs text-slate-400">Belum ada cairan infus yang dicatat untuk pasien ini.</div>`;
       } else {
-        const newPatient = {
-          id: generateUUID(),
-          ...payload,
-          transfusi: [],
-          created_at: new Date().toISOString()
-        };
-        if (isSupabaseOnline && supabaseClient) {
-          try {
-            const { data, error } = await supabaseClient.from('pasien').insert([newPatient]).select().single();
-            if (error) throw error;
-            selectedPatientId = data.id;
-            await fetchAllFromSupabase(true);
-            showToast(`Pasien ${payload.nama} tersimpan di Supabase.`);
-          } catch (err) {
-            return showToast(`Gagal simpan ke Supabase: ${err.message}`, 'error');
-          }
-        } else {
-          state.pasien.unshift(newPatient);
-          selectedPatientId = newPatient.id;
-          saveLocalState();
-          renderAll();
-          showToast(`Pasien ${payload.nama} ditambahkan.`);
-        }
-      }
-      closePatientModal();
-    }
-
-    function deletePatient(patientId) {
-      const p = state.pasien.find(x => x.id === patientId);
-      if (!p) return;
-      showConfirmModal('Hapus Data Pasien?', `Pasien "${p.nama}" beserta seluruh data obat, balance, dan vasoaktifnya akan dihapus.`, async () => {
-        if (isSupabaseOnline && supabaseClient) {
-          try {
-            const { error } = await supabaseClient.from('pasien').delete().eq('id', patientId);
-            if (error) throw error;
-            if (selectedPatientId === patientId) selectedPatientId = null;
-            await fetchAllFromSupabase(true);
-            showToast(`Pasien ${p.nama} dihapus dari Supabase.`, 'info');
-          } catch (err) {
-            showToast(`Gagal hapus Supabase: ${err.message}`, 'error');
-          }
-        } else {
-          state.pasien = state.pasien.filter(x => x.id !== patientId);
-          state.balance_cairan = state.balance_cairan.filter(b => b.pasien_id !== patientId);
-          state.vasoaktif = state.vasoaktif.filter(v => v.pasien_id !== patientId);
-          if (selectedPatientId === patientId) selectedPatientId = null;
-          saveLocalState();
-          renderAll();
-          showToast(`Pasien ${p.nama} dihapus.`, 'info');
-        }
-      }, 'Hapus Pasien');
-    }
-
-    async function persistPatientJsonFields(patient, successMsg) {
-      patient.updated_at = new Date().toISOString();
-      if (isSupabaseOnline && supabaseClient) {
-        try {
-          const { error } = await supabaseClient
-            .from('pasien')
-            .update({
-              obat: patient.obat,
-              antibiotik: patient.antibiotik,
-              transfusi: patient.transfusi,
-              tindakan: patient.tindakan,
-              updated_at: patient.updated_at
-            })
-            .eq('id', patient.id);
-          if (error) throw error;
-          if (successMsg) showToast(successMsg);
-          renderAll();
-        } catch (err) {
-          showToast(`Gagal sinkron Supabase: ${err.message}`, 'error');
-        }
-      } else {
-        saveLocalState();
-        renderAll();
-        if (successMsg) showToast(successMsg);
-      }
-    }
-
-    // =========================================================================
-    // 10. DETAIL PASIEN: OBAT, ANTIBIOTIK, TRANSFUSI, TINDAKAN
-    // =========================================================================
-    function selectPatientDetail(patientId) {
-      selectedPatientId = patientId;
-      renderDashboard();
-      renderPatientDetailPanel();
-      const panel = document.getElementById('patient-detail-panel');
-      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    function switchDetailTab(tab) {
-      currentDetailTab = tab;
-      document.querySelectorAll('.detail-subpanel').forEach(p => p.classList.add('hidden'));
-      document.getElementById(`detail-panel-${tab}`).classList.remove('hidden');
-
-      document.querySelectorAll('.detail-tab').forEach(btn => {
-        if (btn.dataset.dtab === tab) {
-          btn.className = 'detail-tab flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-royal-600 text-white shadow-sm transition';
-        } else {
-          btn.className = 'detail-tab flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-royal-50 transition';
-        }
-      });
-    }
-
-    function renderPatientDetailPanel() {
-      const panel = document.getElementById('patient-detail-panel');
-      const p = state.pasien.find(x => x.id === selectedPatientId);
-      if (!p) {
-        panel.classList.add('hidden');
-        return;
-      }
-      panel.classList.remove('hidden');
-      switchDetailTab(currentDetailTab);
-
-      document.getElementById('detail-patient-banner').innerHTML = `
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <div class="flex flex-wrap items-center gap-2 text-[11px]">
-              <span class="px-2.5 py-0.5 rounded-full bg-white/20 font-bold">${escapeHTML(p.bed)}</span>
-              <span class="px-2.5 py-0.5 rounded-full bg-white/20 font-semibold">${escapeHTML(p.kelas)}</span>
-              <span class="px-2.5 py-0.5 rounded-full bg-white/20 font-mono">${escapeHTML(p.no_rm || 'No RM -')}</span>
-              <span class="px-2.5 py-0.5 rounded-full bg-white/20 font-semibold">BB ${p.bb || 60} kg</span>
-            </div>
-            <h3 class="text-xl font-extrabold mt-2">${escapeHTML(p.nama)}</h3>
-            <p class="text-xs text-blue-100 mt-0.5">${escapeHTML(p.dpjp)} &bull; Dx: ${escapeHTML(p.diagnosa)}</p>
-          </div>
-          <button onclick="selectedPatientId=null; renderDashboard(); renderPatientDetailPanel();" class="self-start sm:self-center px-3.5 py-1.5 rounded-full bg-white/15 hover:bg-white/25 text-xs font-bold transition">
-            Tutup Detail
-          </button>
-        </div>
-      `;
-
-      // 1. Obat Table
-      const obatTbody = document.getElementById('detail-obat-tbody');
-      if (!p.obat || p.obat.length === 0) {
-        obatTbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">Belum ada jadwal obat.</td></tr>`;
-      } else {
-        obatTbody.innerHTML = p.obat.map(o => `
-          <tr>
-            <td class="py-3 px-3">
-              <p class="font-bold text-slate-800">${escapeHTML(o.nama)}</p>
-              <p class="text-[11px] text-royal-600 font-semibold">${escapeHTML(o.dosis || '-')}</p>
-            </td>
-            <td class="py-3 px-3 text-center">${renderTimeChip(o.id, 'pagi', o.pagi, o.pagi_done, o.pagi_info)}</td>
-            <td class="py-3 px-3 text-center">${renderTimeChip(o.id, 'siang', o.siang, o.siang_done, o.siang_info)}</td>
-            <td class="py-3 px-3 text-center">${renderTimeChip(o.id, 'malam', o.malam, o.malam_done, o.malam_info)}</td>
-            <td class="py-3 px-3 text-right">
-              <button onclick="deleteObat('${o.id}')" class="text-xs font-bold text-rose-500 hover:text-rose-700 px-2 py-1 rounded-lg hover:bg-rose-50">Hapus</button>
-            </td>
-          </tr>
-        `).join('');
-      }
-
-      // 2. Antibiotik List
-      const abList = document.getElementById('detail-ab-list');
-      if (!p.antibiotik || p.antibiotik.length === 0) {
-        abList.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Belum ada antibiotik dicatat.</p>`;
-      } else {
-        abList.innerHTML = p.antibiotik.map(a => `
-          <div class="flex items-center justify-between gap-2 p-3 rounded-xl bg-amber-50/80 border border-amber-200/70">
+        infusListEl.innerHTML = infusItems.map(inf => `
+          <div class="rounded-2xl p-4 border flex flex-col justify-between gap-3 ${inf.aktif ? 'bg-sky-50/70 border-sky-200' : 'bg-white border-slate-200/80 opacity-75'}">
             <div>
-              <p class="text-xs font-bold text-slate-800">${escapeHTML(a.nama)}</p>
-              <span class="inline-block mt-1 px-2 py-0.5 rounded-full bg-amber-200/80 text-amber-900 text-[11px] font-extrabold">Hari ke-${a.hari_ke}</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <button onclick="adjustAb('${a.id}', -1)" class="w-7 h-7 rounded-full bg-white border border-amber-300 text-amber-900 font-bold text-xs hover:bg-amber-100">-</button>
-              <button onclick="adjustAb('${a.id}', 1)" class="w-7 h-7 rounded-full bg-white border border-amber-300 text-amber-900 font-bold text-xs hover:bg-amber-100">+</button>
-              <button onclick="deleteAb('${a.id}')" class="ml-1 text-rose-500 hover:text-rose-700 text-xs font-bold px-1.5">×</button>
-            </div>
-          </div>
-        `).join('');
-      }
-
-      // 3. Transfusi List
-      const totalKolf = (p.transfusi || []).reduce((s, t) => s + Number(t.kolf || 0), 0);
-      document.getElementById('detail-tf-total').textContent = `${totalKolf} Kolf`;
-      const tfList = document.getElementById('detail-tf-list');
-      if (!p.transfusi || p.transfusi.length === 0) {
-        tfList.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Belum ada transfusi darah.</p>`;
-      } else {
-        tfList.innerHTML = p.transfusi.map(t => `
-          <div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-[#f7f9fd] border border-slate-100">
-            <div>
-              <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 text-[11px] font-extrabold">${t.kolf} Kolf</span>
-                <span class="text-xs font-bold text-slate-800">${escapeHTML(t.jenis)} (${escapeHTML(t.gol_darah || '-')})</span>
-                <span class="text-[11px] font-mono text-slate-500">${escapeHTML(t.jam_masuk || '')}</span>
+              <div class="flex items-center justify-between gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold ${inf.aktif ? 'bg-sky-600 text-white' : 'bg-slate-200 text-slate-600'}">
+                  ${inf.aktif ? `Aktif • Kolf ke-${inf.kolf_ke}` : `Selesai (${inf.kolf_ke} Kolf)`}
+                </span>
+                <span class="text-xs font-mono font-bold text-sky-800">${escapeHTML(inf.tetesan)}</span>
               </div>
-              <p class="text-[10px] text-slate-400 mt-0.5">${escapeHTML(t.perawat || '')}</p>
+              <h5 class="font-extrabold text-slate-900 text-base mt-2">${escapeHTML(inf.cairan)}</h5>
+              <p class="text-[11px] text-slate-500 mt-0.5">Mulai/Ket: ${escapeHTML(inf.jam || '-')} &bull; ${escapeHTML(inf.perawat || '')}</p>
             </div>
-            <button onclick="deleteTransfusi('${t.id}')" class="text-rose-500 hover:text-rose-700 text-xs font-bold px-2">×</button>
+            <div class="flex items-center gap-2 pt-1">
+              <button type="button" onclick="nextInfusKolf('${inf.id}')" class="flex-1 py-1.5 px-3 rounded-full bg-white hover:bg-sky-600 hover:text-white text-sky-700 border border-sky-200 text-xs font-bold transition">
+                + Ganti Kolf
+              </button>
+              <button type="button" onclick="toggleInfusStatus('${inf.id}')" class="py-1.5 px-3 rounded-full bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition">
+                ${inf.aktif ? 'Stop' : 'Aktifkan'}
+              </button>
+              <button type="button" onclick="deleteInfus('${inf.id}')" class="w-8 h-8 rounded-full bg-white hover:bg-rose-50 text-rose-500 border border-slate-200 flex items-center justify-center text-xs font-bold" title="Hapus">
+                ×
+              </button>
+            </div>
           </div>
         `).join('');
       }
 
+      // 3. Antibiotik List
+<!-- ... existing code ... -->
       // 4. Tindakan List
       const tdList = document.getElementById('detail-tindakan-list');
-      if (!p.tindakan || p.tindakan.length === 0) {
+      const regularActions = getPatientRegularActions(p);
+      if (regularActions.length === 0) {
         tdList.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Belum ada catatan tindakan / lab.</p>`;
       } else {
-        tdList.innerHTML = p.tindakan.map(td => `
+        tdList.innerHTML = regularActions.map(td => `
           <div class="p-3.5 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-              <button onclick="toggleTindakan('${td.id}')" class="w-6 h-6 rounded-lg border flex items-center justify-center transition ${td.selesai ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-slate-300 text-transparent hover:border-royal-500'}">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
-              </button>
-              <div>
-                <p class="text-sm font-bold ${td.selesai ? 'line-through text-slate-400' : 'text-slate-800'}">${escapeHTML(td.judul)}</p>
-                <p class="text-[11px] text-slate-400">${escapeHTML(td.jam || '-')} &bull; ${escapeHTML(td.perawat || '')}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${td.selesai ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${td.selesai ? 'Selesai' : 'Belum'}</span>
-              <button onclick="deleteTindakan('${td.id}')" class="text-rose-500 hover:text-rose-700 text-xs font-bold px-1.5">×</button>
-            </div>
-          </div>
-        `).join('');
-      }
-    }
-
-    function renderTimeChip(obatId, shift, val, done, info) {
-      if (!val || !val.trim()) return '<span class="text-slate-300">-</span>';
-      return `
-        <button onclick="toggleObatDone('${obatId}', '${shift}')" class="inline-flex flex-col items-center px-3 py-1.5 rounded-xl font-mono text-xs font-bold border transition ${
-          done ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-white text-slate-700 border-slate-200 hover:border-royal-400 hover:bg-royal-50'
-        }">
-          <span>${done ? '✓ ' : ''}${escapeHTML(val)}</span>
-          ${done && info ? `<span class="text-[9px] font-sans font-semibold text-emerald-600 mt-0.5 max-w-[110px] truncate">${escapeHTML(info)}</span>` : ''}
-        </button>
-      `;
-    }
-
-    async function handleAddObat(e) {
-      e.preventDefault();
-      const p = state.pasien.find(x => x.id === selectedPatientId);
-      if (!p) return;
-      const nama = document.getElementById('in-obat-nama').value.trim();
-      const dosis = document.getElementById('in-obat-dosis').value.trim();
-      const pagi = document.getElementById('in-obat-pagi').value.trim();
-      const siang = document.getElementById('in-obat-siang').value.trim();
-      const malam = document.getElementById('in-obat-malam').value.trim();
-      if (!pagi && !siang && !malam) return showToast('Isi minimal satu jam pemberian.', 'error');
-
-      p.obat.push({
-        id: generateUUID(), nama, dosis, pagi, siang, malam,
-        pagi_done: false, pagi_info: '', siang_done: false, siang_info: '', malam_done: false, malam_info: ''
-      });
-      e.target.reset();
-      await persistPatientJsonFields(p, `Obat ${nama} disimpan.`);
-    }
-
-    async function toggleObatDone(obatId, shift) {
-      const p = state.pasien.find(x => x.id === selectedPatientId);
-      if (!p) return;
-      const o = p.obat.find(x => x.id === obatId);
-      if (!o) return;
-      const next = !o[`${shift}_done`];
-      o[`${shift}_done`] = next;
-      o[`${shift}_info`] = next ? `${currentUser.nama} (${getNowTime()})` : '';
-      await persistPatientJsonFields(p, next ? `Obat ${o.nama} ditandai diberikan.` : null);
-    }
-
+<!-- ... existing code ... -->
     async function deleteObat(obatId) {
       const p = state.pasien.find(x => x.id === selectedPatientId);
       if (!p) return;
@@ -2528,482 +405,79 @@
       await persistPatientJsonFields(p, 'Jadwal obat dihapus.');
     }
 
+    async function handleAddInfus(e) {
+      e.preventDefault();
+      const p = state.pasien.find(x => x.id === selectedPatientId);
+      if (!p) return;
+      const cairan = document.getElementById('in-infus-cairan').value.trim();
+      const tetesan = document.getElementById('in-infus-tetesan').value.trim();
+      const kolf_ke = parseInt(document.getElementById('in-infus-kolf').value, 10) || 1;
+      const jam = document.getElementById('in-infus-jam').value.trim() || getNowTime();
+
+      const item = buildInfusTindakanItem({
+        id: generateUUID(),
+        cairan,
+        tetesan,
+        kolf_ke,
+        jam,
+        aktif: true,
+        perawat: currentUser.nama
+      });
+
+      p.tindakan = [item, ...(p.tindakan || [])];
+      e.target.reset();
+      document.getElementById('in-infus-kolf').value = 1;
+      await persistPatientJsonFields(p, `Infus ${cairan} (${tetesan}) disimpan.`);
+    }
+
+    async function nextInfusKolf(infusId) {
+      const p = state.pasien.find(x => x.id === selectedPatientId);
+      if (!p) return;
+      const idx = (p.tindakan || []).findIndex(t => t.id === infusId);
+      if (idx === -1) return;
+      const current = getPatientInfusList(p).find(x => x.id === infusId);
+      if (!current) return;
+
+      const nextKolf = current.kolf_ke + 1;
+      p.tindakan[idx] = buildInfusTindakanItem({
+        ...current,
+        kolf_ke: nextKolf,
+        jam: `Kolf ${nextKolf} (${getNowTime()})`,
+        aktif: true,
+        perawat: currentUser.nama
+      });
+      await persistPatientJsonFields(p, `Infus ${current.cairan} diganti ke Kolf ke-${nextKolf}.`);
+    }
+
+    async function toggleInfusStatus(infusId) {
+      const p = state.pasien.find(x => x.id === selectedPatientId);
+      if (!p) return;
+      const idx = (p.tindakan || []).findIndex(t => t.id === infusId);
+      if (idx === -1) return;
+      p.tindakan[idx].selesai = !p.tindakan[idx].selesai;
+      await persistPatientJsonFields(p, p.tindakan[idx].selesai ? 'Infus ditandai selesai/stop.' : 'Infus diaktifkan kembali.');
+    }
+
+    async function deleteInfus(infusId) {
+      const p = state.pasien.find(x => x.id === selectedPatientId);
+      if (!p) return;
+      p.tindakan = (p.tindakan || []).filter(t => t.id !== infusId);
+      await persistPatientJsonFields(p, 'Data infus dihapus.');
+    }
+
     async function handleAddAntibiotik(e) {
-      e.preventDefault();
-      const p = state.pasien.find(x => x.id === selectedPatientId);
-      if (!p) return;
-      const nama = document.getElementById('in-ab-nama').value.trim();
-      const hari_ke = parseInt(document.getElementById('in-ab-hari').value, 10) || 1;
-      p.antibiotik.push({ id: generateUUID(), nama, hari_ke });
-      e.target.reset();
-      document.getElementById('in-ab-hari').value = 1;
-      await persistPatientJsonFields(p, `Antibiotik ${nama} ditambahkan.`);
-    }
-
-    async function adjustAb(abId, delta) {
-      const p = state.pasien.find(x => x.id === selectedPatientId);
-      if (!p) return;
-      const a = p.antibiotik.find(x => x.id === abId);
-      if (!a) return;
-      a.hari_ke = Math.max(1, Number(a.hari_ke || 1) + delta);
-      await persistPatientJsonFields(p, null);
-    }
-
-    async function deleteAb(abId) {
-      const p = state.pasien.find(x => x.id === selectedPatientId);
-      if (!p) return;
-      p.antibiotik = p.antibiotik.filter(x => x.id !== abId);
-      await persistPatientJsonFields(p, 'Antibiotik dihapus.');
-    }
-
-    async function handleAddTransfusi(e) {
-      e.preventDefault();
-      const p = state.pasien.find(x => x.id === selectedPatientId);
-      if (!p) return;
-      p.transfusi.unshift({
-        id: generateUUID(),
-        jenis: document.getElementById('in-tf-jenis').value,
-        gol_darah: document.getElementById('in-tf-gol').value,
-        kolf: parseInt(document.getElementById('in-tf-kolf').value, 10) || 1,
-        jam_masuk: document.getElementById('in-tf-jam').value.trim(),
-        perawat: currentUser.nama
-      });
-      e.target.reset();
-      document.getElementById('in-tf-kolf').value = 1;
-      await persistPatientJsonFields(p, 'Transfusi darah dicatat.');
-    }
-
-    async function quickAddKolf() {
-      const p = state.pasien.find(x => x.id === selectedPatientId);
-      if (!p) return;
-      p.transfusi.unshift({
-        id: generateUUID(), jenis: 'PRC', gol_darah: '-', kolf: 1,
-        jam_masuk: getNowTime(), perawat: currentUser.nama
-      });
-      await persistPatientJsonFields(p, '+1 Kolf PRC ditambahkan.');
-    }
-
-    async function deleteTransfusi(tfId) {
-      const p = state.pasien.find(x => x.id === selectedPatientId);
-      if (!p) return;
-      p.transfusi = p.transfusi.filter(x => x.id !== tfId);
-      await persistPatientJsonFields(p, 'Catatan transfusi dihapus.');
-    }
-
-    function setTindakanChip(text) {
-      const el = document.getElementById('in-tindakan-judul');
-      el.value = text;
-      el.focus();
-    }
-
-    async function handleAddTindakan(e) {
-      e.preventDefault();
-      const p = state.pasien.find(x => x.id === selectedPatientId);
-      if (!p) return;
-      p.tindakan.unshift({
-        id: generateUUID(),
-        judul: document.getElementById('in-tindakan-judul').value.trim(),
-        jam: document.getElementById('in-tindakan-jam').value.trim(),
-        selesai: false,
-        perawat: currentUser.nama
-      });
-      e.target.reset();
-      await persistPatientJsonFields(p, 'Catatan tindakan disimpan.');
-    }
-
-    async function toggleTindakan(tdId) {
-      const p = state.pasien.find(x => x.id === selectedPatientId);
-      if (!p) return;
-      const td = p.tindakan.find(x => x.id === tdId);
-      if (!td) return;
-      td.selesai = !td.selesai;
-      await persistPatientJsonFields(p, null);
-    }
-
-    async function deleteTindakan(tdId) {
-      const p = state.pasien.find(x => x.id === selectedPatientId);
-      if (!p) return;
-      p.tindakan = p.tindakan.filter(x => x.id !== tdId);
-      await persistPatientJsonFields(p, 'Catatan tindakan dihapus.');
-    }
-
-    // =========================================================================
-    // 11. BALANCE CAIRAN
-    // =========================================================================
-    function calcBalanceLive() {
-      const sisa = Number(document.getElementById('bal-sisa').value) || 0;
-      const infus = Number(document.getElementById('bal-infus').value) || 0;
-      const oral = Number(document.getElementById('bal-oral').value) || 0;
-      const urin = Number(document.getElementById('bal-urin').value) || 0;
-      const iwl = Number(document.getElementById('bal-iwl').value) || 0;
-
-      const totalMasuk = infus + oral;
-      const totalKeluar = urin + iwl;
-      const balance = totalMasuk - totalKeluar;
-
-      document.getElementById('bal-live-in').textContent = `${totalMasuk} ml`;
-      document.getElementById('bal-live-out').textContent = `${totalKeluar} ml`;
-      document.getElementById('bal-live-sisa').textContent = `${sisa} ml`;
-
-      const resEl = document.getElementById('bal-live-result');
-      resEl.textContent = `${balance > 0 ? '+' : ''}${balance} ml`;
-      resEl.className = `text-xl font-extrabold ${balance > 0 ? 'text-royal-600' : balance < 0 ? 'text-rose-600' : 'text-emerald-600'}`;
-    }
-
-    async function handleSaveBalance(e) {
-      e.preventDefault();
-      const pasien_id = document.getElementById('bal-patient-select').value;
-      const p = state.pasien.find(x => x.id === pasien_id);
-      if (!p) return showToast('Pilih pasien terlebih dahulu!', 'error');
-
-      const sisa_infus = Number(document.getElementById('bal-sisa').value) || 0;
-      const infus_masuk = Number(document.getElementById('bal-infus').value) || 0;
-      const makan_minum = Number(document.getElementById('bal-oral').value) || 0;
-      const urin = Number(document.getElementById('bal-urin').value) || 0;
-      const iwl = Number(document.getElementById('bal-iwl').value) || 0;
-      const total_masuk = infus_masuk + makan_minum;
-      const total_keluar = urin + iwl;
-      const balance = total_masuk - total_keluar;
-
-      const record = {
-        id: generateUUID(),
-        pasien_id,
-        nama_pasien: p.nama,
-        bed: p.bed,
-        tanggal: document.getElementById('bal-date').value || getTodayISO(),
-        shift: document.getElementById('bal-shift').value,
-        sisa_infus, infus_masuk, makan_minum, urin, iwl,
-        total_masuk, total_keluar, balance,
-        perawat: currentUser.nama,
-        catatan: document.getElementById('bal-catatan').value.trim(),
-        created_at: new Date().toISOString()
-      };
-
-      if (isSupabaseOnline && supabaseClient) {
-        try {
-          const { error } = await supabaseClient.from('balance_cairan').insert([record]);
-          if (error) throw error;
-          await fetchAllFromSupabase(true);
-          showToast('Balance cairan tersimpan di Supabase.');
-        } catch (err) {
-          return showToast(`Gagal simpan Supabase: ${err.message}`, 'error');
-        }
-      } else {
-        state.balance_cairan.unshift(record);
-        saveLocalState();
-        renderAll();
-        showToast('Balance cairan disimpan.');
-      }
-
-      ['bal-sisa', 'bal-infus', 'bal-oral', 'bal-urin', 'bal-iwl'].forEach(id => document.getElementById(id).value = 0);
-      document.getElementById('bal-catatan').value = '';
-      calcBalanceLive();
-    }
-
-    function renderBalanceHistory() {
-      const filterPid = document.getElementById('bal-filter-patient').value;
-      const list = state.balance_cairan.filter(b => filterPid === 'ALL' || b.pasien_id === filterPid);
-      const tbody = document.getElementById('balance-history-tbody');
-
-      if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="py-10 text-center text-slate-400">Belum ada riwayat balance cairan.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = list.map(b => {
-        const balCls = b.balance > 0 ? 'bg-royal-100 text-royal-800' : b.balance < 0 ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700';
-        return `
-          <tr>
-            <td class="py-3 px-3">
-              <p class="font-bold text-slate-800">${escapeHTML(b.nama_pasien)} (${escapeHTML(b.bed || '')})</p>
-              <p class="text-[11px] text-slate-400">${escapeHTML(b.tanggal)} &bull; Shift ${escapeHTML(b.shift)} &bull; ${escapeHTML(b.perawat || '')}</p>
-              ${b.catatan ? `<p class="text-[10px] text-slate-500 italic">${escapeHTML(b.catatan)}</p>` : ''}
-            </td>
-            <td class="py-3 px-3">
-              <p class="font-bold text-emerald-700">${b.total_masuk} ml</p>
-              <p class="text-[10px] text-slate-400">Inf ${b.infus_masuk} + PO ${b.makan_minum}</p>
-            </td>
-            <td class="py-3 px-3">
-              <p class="font-bold text-amber-700">${b.total_keluar} ml</p>
-              <p class="text-[10px] text-slate-400">Urin ${b.urin}${b.iwl ? ` + IWL ${b.iwl}` : ''}</p>
-            </td>
-            <td class="py-3 px-3 font-semibold text-slate-600">${b.sisa_infus} ml</td>
-            <td class="py-3 px-3">
-              <span class="px-2.5 py-1 rounded-lg font-extrabold text-xs ${balCls}">${b.balance > 0 ? '+' : ''}${b.balance} ml</span>
-            </td>
-            <td class="py-3 px-3 text-right">
-              <button onclick="deleteBalance('${b.id}')" class="text-xs font-bold text-rose-500 hover:text-rose-700 px-2 py-1">Hapus</button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    async function deleteBalance(balId) {
-      if (isSupabaseOnline && supabaseClient) {
-        try {
-          const { error } = await supabaseClient.from('balance_cairan').delete().eq('id', balId);
-          if (error) throw error;
-          await fetchAllFromSupabase(true);
-          showToast('Riwayat balance dihapus dari Supabase.', 'info');
-        } catch (err) {
-          showToast(`Gagal hapus: ${err.message}`, 'error');
-        }
-      } else {
-        state.balance_cairan = state.balance_cairan.filter(b => b.id !== balId);
-        saveLocalState();
-        renderAll();
-        showToast('Riwayat balance dihapus.', 'info');
-      }
-    }
-
-    // =========================================================================
-    // 12. KALKULATOR & PANTAUAN VASCON / DOBUTAMIN
-    // =========================================================================
-    function onSelectVasoPatient() {
-      const pid = document.getElementById('vaso-patient-select').value;
-      const p = state.pasien.find(x => x.id === pid);
-      if (p && p.bb) {
-        document.getElementById('vaso-bb').value = p.bb;
-        renderVasoTable();
-      }
-    }
-
-    function selectVasoDrug(drug, resetDefaults = true) {
-      currentVasoDrug = drug;
-      const btnV = document.getElementById('btn-drug-vascon');
-      const btnD = document.getElementById('btn-drug-dobutamin');
-
-      if (drug === 'Vascon') {
-        btnV.className = 'py-2.5 px-3 rounded-xl border-2 border-royal-600 bg-royal-600 text-white text-sm font-bold shadow-sm transition';
-        btnD.className = 'py-2.5 px-3 rounded-xl border-2 border-slate-200 bg-white text-slate-600 hover:bg-slate-50 text-sm font-semibold transition';
-        document.getElementById('vaso-table-title').textContent = 'Tabel Pemberian Dosis Awal Vascon (Norepinephrine)';
-        if (resetDefaults) {
-          document.getElementById('vaso-sediaan').value = 4;
-          document.getElementById('vaso-vol').value = 50;
-          currentVasoDose = 0.05;
-        }
-      } else {
-        btnD.className = 'py-2.5 px-3 rounded-xl border-2 border-royal-600 bg-royal-600 text-white text-sm font-bold shadow-sm transition';
-        btnV.className = 'py-2.5 px-3 rounded-xl border-2 border-slate-200 bg-white text-slate-600 hover:bg-slate-50 text-sm font-semibold transition';
-        document.getElementById('vaso-table-title').textContent = 'Tabel Pemberian Dosis Awal Dobutamin';
-        if (resetDefaults) {
-          document.getElementById('vaso-sediaan').value = 250;
-          document.getElementById('vaso-vol').value = 50;
-          currentVasoDose = 5;
-        }
-      }
-      document.getElementById('vaso-active-drug-badge').textContent = drug;
-      renderVasoTable();
-    }
-
-    function computeVasoParams() {
-      const bb = parseFloat(document.getElementById('vaso-bb').value) || 60;
-      const sediaan_mg = parseFloat(document.getElementById('vaso-sediaan').value) || (currentVasoDrug === 'Vascon' ? 4 : 250);
-      const pengencer_ml = parseFloat(document.getElementById('vaso-vol').value) || 50;
-      const conc = (sediaan_mg * 1000) / pengencer_ml;
-      return { bb, sediaan_mg, pengencer_ml, conc };
-    }
-
-    function calcRateMlHr(dose, bb, conc) {
-      return conc > 0 ? (dose * bb * 60) / conc : 0;
-    }
-
-    function renderVasoTable() {
-      const { bb, conc } = computeVasoParams();
-      document.getElementById('vaso-conc-label').textContent = `${conc.toFixed(1).replace(/\.0$/, '')} mcg/ml`;
-
-      const doses = currentVasoDrug === 'Vascon' ? VASCON_DOSES : DOBUTAMIN_DOSES;
-      const tbody = document.getElementById('vaso-dose-tbody');
-
-      tbody.innerHTML = doses.map(d => {
-        const rate = calcRateMlHr(d, bb, conc);
-        const isActive = Math.abs(currentVasoDose - d) < 0.0001;
-        return `
-          <tr onclick="currentVasoDose=${d}; renderVasoTable();" class="cursor-pointer ${isActive ? 'row-selected' : ''}">
-            <td class="py-3 px-4 font-mono ${isActive ? 'font-extrabold text-royal-800' : 'text-slate-700'}">${d} <span class="text-xs font-sans text-slate-400">mcg/kg/mnt</span></td>
-            <td class="py-3 px-4 font-mono text-base ${isActive ? 'font-extrabold text-royal-600' : 'font-semibold text-slate-800'}">${rate.toFixed(2)} <span class="text-xs font-sans text-slate-500">ml/jam</span></td>
-            <td class="py-3 px-4 text-right">
-              ${isActive
-                ? '<span class="px-3 py-1 rounded-full bg-royal-600 text-white text-[11px] font-bold">Dosis Aktif Saat Ini</span>'
-                : '<span class="text-xs text-slate-400 font-semibold">Pilih</span>'}
-            </td>
-          </tr>
-        `;
-      }).join('');
-
-      const activeRate = calcRateMlHr(currentVasoDose, bb, conc);
-      document.getElementById('vaso-active-dose-text').innerHTML = `${currentVasoDose} <span class="text-xs font-medium text-blue-100">mcg/kg/mnt</span>`;
-      document.getElementById('vaso-active-rate-text').innerHTML = `${activeRate.toFixed(2)} <span class="text-xs font-medium text-amber-100">ml/jam</span>`;
-    }
-
-    async function handleSaveVaso() {
-      const pasien_id = document.getElementById('vaso-patient-select').value;
-      const p = state.pasien.find(x => x.id === pasien_id);
-      if (!p) return showToast('Pilih pasien terlebih dahulu!', 'error');
-
-      const { bb, sediaan_mg, pengencer_ml, conc } = computeVasoParams();
-      const kecepatan_ml_jam = parseFloat(calcRateMlHr(currentVasoDose, bb, conc).toFixed(2));
-      const existing = state.vasoaktif.find(v => v.pasien_id === pasien_id && v.jenis_obat === currentVasoDrug);
-
-      const record = {
-        id: existing ? existing.id : generateUUID(),
-        pasien_id,
-        nama_pasien: p.nama,
-        bed: p.bed,
-        jenis_obat: currentVasoDrug,
-        bb, sediaan_mg, pengencer_ml,
-        dosis_aktif: currentVasoDose,
-        kecepatan_ml_jam,
-        perawat: currentUser.nama,
-        updated_at: new Date().toISOString()
-      };
-
-      if (isSupabaseOnline && supabaseClient) {
-        try {
-          const { error } = existing
-            ? await supabaseClient.from('vasoaktif').update(record).eq('id', record.id)
-            : await supabaseClient.from('vasoaktif').insert([record]);
-          if (error) throw error;
-          await fetchAllFromSupabase(true);
-          showToast(`${currentVasoDrug} (${currentVasoDose} mcg • ${kecepatan_ml_jam} ml/jam) tersimpan di Supabase.`);
-        } catch (err) {
-          showToast(`Gagal simpan Supabase: ${err.message}`, 'error');
-        }
-      } else {
-        if (existing) {
-          const idx = state.vasoaktif.findIndex(v => v.id === existing.id);
-          state.vasoaktif[idx] = record;
-        } else {
-          state.vasoaktif.unshift(record);
-        }
-        saveLocalState();
-        renderAll();
-        showToast(`${currentVasoDrug} disimpan ke pantauan pasien.`);
-      }
-    }
-
-    function renderActiveVasoList() {
-      const container = document.getElementById('active-vaso-list');
-      if (state.vasoaktif.length === 0) {
-        container.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 text-sm bg-[#f7f9fd] rounded-3xl">Belum ada pasien aktif mendapat Vascon atau Dobutamin.</div>`;
-        return;
-      }
-
-      container.innerHTML = state.vasoaktif.map(v => `
-        <div class="rounded-3xl bg-[#f3f6fb] border border-slate-200/70 p-4 flex flex-col justify-between gap-3">
-          <div>
-            <div class="flex items-center justify-between">
-              <span class="px-3 py-1 rounded-full text-xs font-extrabold ${v.jenis_obat === 'Vascon' ? 'bg-royal-600 text-white' : 'bg-indigo-600 text-white'}">${escapeHTML(v.jenis_obat)}</span>
-              <span class="text-xs font-bold text-slate-500">${escapeHTML(v.bed || '')}</span>
-            </div>
-            <h4 class="font-extrabold text-royal-900 text-base mt-2.5">${escapeHTML(v.nama_pasien)}</h4>
-            <p class="text-xs text-slate-500">BB ${v.bb} kg &bull; ${v.sediaan_mg} mg / ${v.pengencer_ml} ml</p>
-
-            <div class="mt-3 grid grid-cols-2 gap-2 bg-white rounded-2xl p-3 border border-slate-200/60">
-              <div>
-                <span class="text-[10px] font-bold text-slate-400 uppercase block">Dosis Aktif</span>
-                <span class="text-base font-extrabold text-royal-900 font-mono">${v.dosis_aktif}</span>
-                <span class="text-[10px] text-slate-400 block">mcg/kg/mnt</span>
-              </div>
-              <div class="border-l border-slate-100 pl-3">
-                <span class="text-[10px] font-bold text-slate-400 uppercase block">Syringe Pump</span>
-                <span class="text-base font-extrabold text-royal-600 font-mono">${Number(v.kecepatan_ml_jam).toFixed(2)}</span>
-                <span class="text-[10px] text-slate-400 block">ml/jam</span>
-              </div>
-            </div>
-            <p class="text-[11px] text-slate-400 mt-2">Perawat: ${escapeHTML(v.perawat || '-')}</p>
-          </div>
-          <div class="flex gap-2">
-            <button onclick="loadVasoToCalc('${v.id}')" class="flex-1 py-2 rounded-full bg-white hover:bg-royal-600 hover:text-white text-royal-700 border border-royal-200 text-xs font-bold transition">Titrasi Dosis</button>
-            <button onclick="deleteVaso('${v.id}')" class="px-3.5 py-2 rounded-full bg-white hover:bg-rose-600 hover:text-white text-rose-600 border border-rose-200 text-xs font-bold transition">Stop</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function loadVasoToCalc(vasoId) {
-      const v = state.vasoaktif.find(x => x.id === vasoId);
-      if (!v) return;
-      document.getElementById('vaso-patient-select').value = v.pasien_id;
-      document.getElementById('vaso-bb').value = v.bb;
-      document.getElementById('vaso-sediaan').value = v.sediaan_mg;
-      document.getElementById('vaso-vol').value = v.pengencer_ml;
-      currentVasoDose = Number(v.dosis_aktif);
-      selectVasoDrug(v.jenis_obat, false);
-      document.getElementById('main-scroll-area').scrollTo({ top: 0, behavior: 'smooth' });
-      showToast(`Data ${v.jenis_obat} dimuat ke kalkulator.`, 'info');
-    }
-
-    function deleteVaso(vasoId) {
-      showConfirmModal('Hentikan Terapi Vasoaktif?', 'Pasien akan dihapus dari daftar pantauan Vascon/Dobutamin.', async () => {
-        if (isSupabaseOnline && supabaseClient) {
-          try {
-            const { error } = await supabaseClient.from('vasoaktif').delete().eq('id', vasoId);
-            if (error) throw error;
-            await fetchAllFromSupabase(true);
-            showToast('Terapi dihentikan di Supabase.', 'info');
-          } catch (err) {
-            showToast(`Gagal hapus: ${err.message}`, 'error');
-          }
-        } else {
-          state.vasoaktif = state.vasoaktif.filter(v => v.id !== vasoId);
-          saveLocalState();
-          renderAll();
-          showToast('Terapi dihentikan.', 'info');
-        }
-      }, 'Hentikan');
-    }
-
-    // =========================================================================
-    // 13. REKAP & CETAK OBAT KESELURUHAN
-    // =========================================================================
-    function renderRecapTable() {
-      const nowStr = formatDateIndo(new Date());
-      document.getElementById('print-date-now').textContent = nowStr;
-      document.getElementById('print-sign-date').textContent = nowStr;
-      if (currentUser) {
-        document.getElementById('print-nurse-now').textContent = `${currentUser.nama} (${currentUser.jabatan || 'Perawat'})`;
-        document.getElementById('print-sign-nurse').textContent = `( ${currentUser.nama} )`;
-      }
-
-      const filterPid = document.getElementById('recap-filter-patient').value;
-      const filterShift = document.getElementById('recap-filter-shift').value;
-      const list = state.pasien.filter(p => filterPid === 'ALL' || p.id === filterPid);
-      const tbody = document.getElementById('recap-tbody');
-
-      if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-slate-400">Belum ada data pasien untuk dicetak.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = list.map((p, idx) => {
-        const meds = (p.obat || []).filter(m => filterShift === 'ALL' ? true : Boolean(m[filterShift] && m[filterShift].trim()));
-        const totalKolf = (p.transfusi || []).reduce((s, t) => s + Number(t.kolf || 0), 0);
-
-        const abHtml = (p.antibiotik || []).length > 0
-          ? `<div class="mt-1.5 flex flex-wrap gap-1">${p.antibiotik.map(a => `<span class="print-badge inline-block px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-extrabold">${escapeHTML(a.nama)} (H-${a.hari_ke})</span>`).join('')}</div>`
-          : '';
-
-        const medListHtml = meds.length > 0
-          ? `<div class="space-y-1">${meds.map(m => `<div class="font-semibold text-slate-800">${escapeHTML(m.nama)} <span class="text-slate-500 font-normal">${escapeHTML(m.dosis || '')}</span></div>`).join('')}</div>${abHtml}`
-          : `<span class="text-slate-400 italic text-xs">Tidak ada jadwal</span>${abHtml}`;
-
-        const renderCol = (sh) => {
-          if (meds.length === 0) return '-';
-          return `<div class="space-y-1">${meds.map(m => {
-            const val = m[sh];
-            if (!val) return '<div class="text-slate-300">-</div>';
-            return `<div class="font-mono font-bold ${m[`${sh}_done`] ? 'text-emerald-700' : 'text-slate-800'}">${escapeHTML(val)}${m[`${sh}_done`] ? ' ✓' : ''}</div>`;
-          }).join('')}</div>`;
-        };
-
+<!-- ... existing code ... -->
         const tfHtml = totalKolf > 0
           ? `<div class="mb-1"><span class="inline-block px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-bold text-[11px]">Transfusi: ${totalKolf} Kolf</span></div>`
           : '';
-        const tdHtml = (p.tindakan || []).length > 0
-          ? `<ul class="list-disc pl-4 space-y-0.5 text-[11px] text-slate-700">${p.tindakan.map(t => `<li>${escapeHTML(t.judul)} (${t.selesai ? 'Selesai' : 'Belum'})</li>`).join('')}</ul>`
-          : '<span class="text-slate-400 text-[11px]">-</span>';
+        const activeInfus = getPatientInfusList(p).filter(inf => inf.aktif);
+        const infusHtml = activeInfus.length > 0
+          ? `<div class="mb-1 space-y-0.5">${activeInfus.map(inf => `<div><span class="inline-block px-2 py-0.5 rounded bg-sky-100 text-sky-900 font-bold text-[11px]">Infus: ${escapeHTML(inf.cairan)} (${escapeHTML(inf.tetesan)}) - Kolf ${inf.kolf_ke}</span></div>`).join('')}</div>`
+          : '';
+        const regularTd = getPatientRegularActions(p);
+        const tdHtml = regularTd.length > 0
+          ? `<ul class="list-disc pl-4 space-y-0.5 text-[11px] text-slate-700">${regularTd.map(t => `<li>${escapeHTML(t.judul)} (${t.selesai ? 'Selesai' : 'Belum'})</li>`).join('')}</ul>`
+          : (!tfHtml && !infusHtml ? '<span class="text-slate-400 text-[11px]">-</span>' : '');
 
         return `
           <tr class="align-top">
@@ -3017,27 +491,9 @@
             <td class="py-3.5 px-3 text-center">${renderCol('pagi')}</td>
             <td class="py-3.5 px-3 text-center">${renderCol('siang')}</td>
             <td class="py-3.5 px-3 text-center">${renderCol('malam')}</td>
-            <td class="py-3.5 px-3">${tfHtml}${tdHtml}</td>
+            <td class="py-3.5 px-3">${infusHtml}${tfHtml}${tdHtml}</td>
           </tr>
         `;
       }).join('');
     }
-
-    // =========================================================================
-    // 14. BOOTSTRAP APPLICATION
-    // =========================================================================
-    window.addEventListener('DOMContentLoaded', async () => {
-      loadLocalState();
-      await initSupabaseConnection(true);
-      loadSession();
-
-      if (currentUser) {
-        await enterMainApp();
-      } else {
-        document.getElementById('auth-screen').classList.remove('hidden');
-        document.getElementById('app-frame').classList.add('hidden');
-      }
-    });
-  </script>
-</body>
-</html>
+<!-- ... existing code ... -->
