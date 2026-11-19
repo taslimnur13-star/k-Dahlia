@@ -1373,13 +1373,14 @@
     // 5. SUPABASE INITIALIZATION, FETCH & REALTIME SYNC
     // =========================================================================
     function getEffectiveSupabaseCredentials() {
+      // Prioritaskan kredensial permanen yang sudah tertanam di kode jika valid
+      if (SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL.startsWith('https://')) {
+        return { url: SUPABASE_URL.trim(), key: SUPABASE_ANON_KEY.trim() };
+      }
       const savedUrl = (localStorage.getItem(RUNTIME_SB_URL_KEY) || '').trim();
       const savedKey = (localStorage.getItem(RUNTIME_SB_KEY_KEY) || '').trim();
       if (savedUrl && savedKey) {
         return { url: savedUrl, key: savedKey };
-      }
-      if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-        return { url: SUPABASE_URL.trim(), key: SUPABASE_ANON_KEY.trim() };
       }
       return null;
     }
@@ -1425,7 +1426,7 @@
 
     async function initSupabaseConnection(silent = true) {
       const creds = getEffectiveSupabaseCredentials();
-      if (!creds || !window.supabase) {
+      if (!creds) {
         supabaseClient = null;
         stopRealtimeSync();
         updateConnectionUI(false);
@@ -1433,8 +1434,22 @@
         return false;
       }
 
+      if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+        supabaseClient = null;
+        stopRealtimeSync();
+        updateConnectionUI(false);
+        loadLocalState();
+        if (!silent) {
+          showToast('Library Supabase dari CDN gagal dimuat. Periksa koneksi internet atau refresh halaman.', 'error');
+        }
+        return false;
+      }
+
       try {
-        supabaseClient = window.supabase.createClient(creds.url, creds.key);
+        supabaseClient = window.supabase.createClient(creds.url, creds.key, {
+          auth: { persistSession: false, autoRefreshToken: false }
+        });
+
         const { error } = await supabaseClient.from('perawat').select('id').limit(1);
         if (error) throw error;
 
@@ -1450,7 +1465,8 @@
         updateConnectionUI(false);
         loadLocalState();
         if (!silent) {
-          showToast(`Gagal koneksi Supabase: ${err.message || 'Cek koneksi internet'}`, 'error');
+          const detail = err?.message || err?.error_description || 'Periksa internet / Project Supabase';
+          showToast(`Gagal koneksi Supabase: ${detail}`, 'error');
         }
         return false;
       }
