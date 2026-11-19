@@ -1066,56 +1066,119 @@
   </div>
 
   <!-- ==================== MODAL TAMBAH / EDIT PASIEN ==================== -->
-  <div id="patient-modal" class="fixed inset-0 z-[65] hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 no-print">
-    <div class="bg-white rounded-[28px] shadow-2xl max-w-lg w-full overflow-hidden border border-slate-100">
-      <div class="px-6 py-4 bg-royal-600 text-white flex items-center justify-between">
-        <h3 id="patient-modal-title" class="font-bold text-base">Tambah Pasien Baru</h3>
-        <button onclick="closePatientModal()" class="w-8 h-8 rounded-full hover:bg-white/20 flex items-center justify-center transition">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+  <div id="patient-modal" class="fixed inset-0 z-[65] hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-3 sm:p-4 no-print">
+    <div class="bg-white rounded-[28px] shadow-2xl max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-100">
+      <!-- Header -->
+      <div class="px-6 pt-6 pb-3 flex items-center justify-between shrink-0">
+        <h3 id="patient-modal-title" class="font-extrabold text-xl text-royal-600 tracking-tight">Data pasien</h3>
+        <button type="button" onclick="closePatientModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
-      <form onsubmit="handleSavePatient(event)" class="p-6 space-y-3.5">
+
+      <!-- Scrollable Form Body -->
+      <form onsubmit="handleSavePatient(event)" class="px-6 pb-6 overflow-y-auto space-y-4">
         <input type="hidden" id="edit-patient-id" />
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div class="sm:col-span-2">
-            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nama Pasien</label>
-            <input type="text" id="p-nama" required placeholder="Tn. Ahmad Suryadi" class="w-full px-3.5 py-2.5 rounded-xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 text-sm outline-none" />
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">No. RM</label>
-            <input type="text" id="p-norm" placeholder="RM-00123" class="w-full px-3.5 py-2.5 rounded-xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-mono outline-none" />
-          </div>
+
+        <!-- Nama Pasien -->
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1.5">Nama pasien</label>
+          <input type="text" id="p-nama" required placeholder="Masukkan nama lengkap pasien"
+            class="w-full px-4 py-3 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 focus:ring-2 focus:ring-royal-100 text-sm font-medium text-slate-800 outline-none transition" />
         </div>
-        <div class="grid grid-cols-3 gap-3">
+
+        <!-- Kamar & Dokter -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Bed</label>
-            <input type="text" id="p-bed" required placeholder="Bed 01" class="w-full px-3.5 py-2.5 rounded-xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 text-sm outline-none" />
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kelas</label>
-            <select id="p-kelas" class="w-full px-3 py-2.5 rounded-xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-semibold outline-none">
-              <option value="VIP">VIP</option>
-              <option value="Kelas 1">Kelas 1</option>
-              <option value="Kelas 2">Kelas 2</option>
-              <option value="Kelas 3">Kelas 3</option>
+            <label class="block text-xs font-bold text-slate-500 mb-1.5">Kamar</label>
+            <select id="p-bed" required
+              class="w-full px-4 py-3 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-semibold text-slate-800 outline-none transition">
+              <option value="">Pilih kamar</option>
+              <option value="Kamar 1 - Bed 1">Kamar 1 - Bed 1</option>
+              <option value="Kamar 1 - Bed 2">Kamar 1 - Bed 2</option>
+              <option value="Kamar 2 - Bed 1">Kamar 2 - Bed 1</option>
+              <option value="Kamar 2 - Bed 2">Kamar 2 - Bed 2</option>
+              <option value="Kamar 3 - Bed 1">Kamar 3 - Bed 1</option>
+              <option value="Kamar 3 - Bed 2">Kamar 3 - Bed 2</option>
+              <option value="Kamar 4 - Bed 1">Kamar 4 - Bed 1</option>
+              <option value="Kamar 4 - Bed 2">Kamar 4 - Bed 2</option>
+              <option value="Kamar 5 - Bed 1">Kamar 5 - Bed 1</option>
+              <option value="Kamar 5 - Bed 2">Kamar 5 - Bed 2</option>
+              <option value="Kamar 6 - Bed 1">Kamar 6 - Bed 1</option>
+              <option value="Kamar 6 - Bed 2">Kamar 6 - Bed 2</option>
+              <option value="Kamar 7 (VIP)">Kamar 7 (VIP)</option>
+              <option value="Kamar 8 (VIP)">Kamar 8 (VIP)</option>
+              <option value="Isolasi 1">Isolasi 1</option>
+              <option value="Isolasi 2">Isolasi 2</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">BB (kg)</label>
-            <input type="number" id="p-bb" min="1" step="0.5" value="60" required class="w-full px-3.5 py-2.5 rounded-xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-bold outline-none" />
+            <label class="block text-xs font-bold text-slate-500 mb-1.5">Dokter</label>
+            <input type="text" id="p-dpjp" required placeholder="Nama DPJP"
+              class="w-full px-4 py-3 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 focus:ring-2 focus:ring-royal-100 text-sm font-medium text-slate-800 outline-none transition" />
           </div>
         </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">DPJP (Dokter Penanggung Jawab)</label>
-          <input type="text" id="p-dpjp" required placeholder="dr. Hendra Wijaya, Sp.PD" class="w-full px-3.5 py-2.5 rounded-xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 text-sm outline-none" />
+
+        <!-- Info Tambahan Opsional (No RM, Kelas, BB, Diagnosa) -->
+        <details class="group rounded-2xl bg-[#f8fafc] border border-slate-200/70 px-4 py-2.5">
+          <summary class="text-xs font-bold text-slate-500 cursor-pointer select-none flex items-center justify-between">
+            <span>Info Tambahan (No. RM, Kelas, BB, Diagnosa)</span>
+            <span class="text-[11px] text-royal-600 group-open:hidden">+ Isi Opsional</span>
+          </summary>
+          <div class="grid grid-cols-3 gap-2.5 pt-3 pb-1">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 mb-1">No. RM</label>
+              <input type="text" id="p-norm" placeholder="RM-00123" class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono outline-none" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 mb-1">Kelas</label>
+              <select id="p-kelas" class="w-full px-2.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-semibold outline-none">
+                <option value="Kelas 1">Kelas 1</option>
+                <option value="VIP">VIP</option>
+                <option value="Kelas 2">Kelas 2</option>
+                <option value="Kelas 3">Kelas 3</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 mb-1">BB (kg)</label>
+              <input type="number" id="p-bb" min="1" step="0.5" value="60" class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold outline-none" />
+            </div>
+            <div class="col-span-3">
+              <label class="block text-[11px] font-bold text-slate-500 mb-1">Diagnosa Medis</label>
+              <input type="text" id="p-diagnosa" placeholder="Contoh: CHF NYHA III + Hipotensi" class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs outline-none" />
+            </div>
+          </div>
+        </details>
+
+        <!-- Dynamic Obat List -->
+        <div class="space-y-2.5">
+          <label class="block text-xs font-bold text-slate-500">Obat</label>
+          <div id="modal-meds-container" class="space-y-4"></div>
+
+          <button type="button" onclick="addModalMedRow()"
+            class="px-5 py-2.5 rounded-full bg-royal-100 hover:bg-royal-200 text-royal-700 text-xs font-bold transition inline-flex items-center gap-1.5">
+            <span>+ Tambah obat</span>
+          </button>
         </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Diagnosa Medis</label>
-          <input type="text" id="p-diagnosa" required placeholder="CHF NYHA III + Hipotensi" class="w-full px-3.5 py-2.5 rounded-xl bg-[#f3f6fb] border border-transparent focus:bg-white focus:border-royal-500 text-sm outline-none" />
+
+        <!-- Rencana Tindakan -->
+        <div class="pt-1">
+          <label class="block text-xs font-bold text-slate-500 mb-1.5">Rencana tindakan (satu tindakan per baris, otomatis jadi ceklis)</label>
+          <textarea id="p-rencana-tindakan" rows="3"
+            placeholder="Contoh:&#10;Observasi TTV tiap 4 jam&#10;Ganti balutan luka"
+            class="w-full px-4 py-3 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 focus:ring-2 focus:ring-royal-100 text-sm text-slate-800 outline-none transition"></textarea>
         </div>
+
+        <!-- Bottom Action Buttons -->
         <div class="pt-2 flex justify-end gap-2.5">
-          <button type="button" onclick="closePatientModal()" class="px-5 py-2.5 rounded-full text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Batal</button>
-          <button type="submit" class="px-6 py-2.5 rounded-full text-sm font-bold text-white bg-royal-600 hover:bg-royal-700 shadow-sm transition">Simpan Pasien</button>
+          <button type="button" onclick="closePatientModal()"
+            class="px-6 py-2.5 rounded-full text-sm font-bold text-royal-700 bg-royal-100 hover:bg-royal-200 transition">
+            Batal
+          </button>
+          <button type="submit"
+            class="px-7 py-2.5 rounded-full text-sm font-bold text-white bg-royal-600 hover:bg-royal-700 shadow-md shadow-royal-600/25 transition">
+            Simpan
+          </button>
         </div>
       </form>
     </div>
@@ -1808,129 +1871,211 @@
     // =========================================================================
     // 9. DASHBOARD & PASIEN CRUD (SUPABASE + LOCAL)
     // =========================================================================
-    function countPendingMedsForPatient(p) {
-      let pending = 0;
-      (p.obat || []).forEach(o => {
-        ['pagi', 'siang', 'malam'].forEach(sh => {
-          if (o[sh] && o[sh].trim() && !o[`${sh}_done`]) pending++;
-        });
-      });
-      return pending;
+    function format4DigitTimes(rawStr) {
+      const digits = (rawStr || '').replace(/\D/g, '');
+      if (!digits) return '';
+      const chunks = [];
+      for (let i = 0; i < digits.length; i += 4) {
+        const part = digits.slice(i, i + 4);
+        if (part.length === 4) {
+          chunks.push(`${part.slice(0, 2)}:${part.slice(2, 4)}`);
+        } else if (part.length > 2) {
+          chunks.push(`${part.slice(0, 2)}:${part.slice(2)}`);
+        } else {
+          chunks.push(part);
+        }
+      }
+      return chunks.join(', ');
     }
 
-    function renderDashboard() {
-      const pendingPatients = state.pasien.filter(p => countPendingMedsForPatient(p) > 0);
-      const totalPendingCount = state.pasien.reduce((sum, p) => sum + countPendingMedsForPatient(p), 0);
-      const abTfPatients = state.pasien.filter(p => (p.antibiotik || []).length > 0 || (p.transfusi || []).length > 0);
-      const vasoBalIds = new Set([
-        ...state.vasoaktif.map(v => v.pasien_id),
-        ...state.balance_cairan.map(b => b.pasien_id)
-      ]);
-      const vasoBalPatients = state.pasien.filter(p => vasoBalIds.has(p.id));
+    function handleModalTimeInput(inputEl, rowId, shift) {
+      const formatted = format4DigitTimes(inputEl.value);
+      inputEl.value = formatted;
+      const cb = document.getElementById(`cb-${shift}-${rowId}`);
+      if (cb) cb.checked = formatted.trim().length > 0;
+    }
 
-      document.getElementById('qa-count-patients').textContent = state.pasien.length;
-      document.getElementById('qa-avatars-patients').innerHTML = renderAvatarStack(state.pasien, 'ring-[#2563c9]');
+    function toggleModalShiftCheck(rowId, shift) {
+      const cb = document.getElementById(`cb-${shift}-${rowId}`);
+      const inp = document.getElementById(`in-${shift}-${rowId}`);
+      if (!cb || !inp) return;
+      if (cb.checked && !inp.value.trim()) {
+        const defaults = { pagi: '09:00', siang: '17:00', malam: '21:00' };
+        inp.value = defaults[shift] || '08:00';
+      } else if (!cb.checked) {
+        inp.value = '';
+      }
+    }
 
-      document.getElementById('qa-count-pending').textContent = totalPendingCount;
-      document.getElementById('qa-avatars-pending').innerHTML = renderAvatarStack(pendingPatients, 'ring-[#f3f6fb]');
-
-      document.getElementById('qa-count-abtf').textContent = abTfPatients.length;
-      document.getElementById('qa-avatars-abtf').innerHTML = renderAvatarStack(abTfPatients, 'ring-[#f3f6fb]');
-
-      document.getElementById('qa-count-vasobal').textContent = vasoBalPatients.length;
-      document.getElementById('qa-avatars-vasobal').innerHTML = renderAvatarStack(vasoBalPatients, 'ring-[#f3f6fb]');
-
-      const query = (document.getElementById('global-search').value || '').trim().toLowerCase();
-      let filtered = state.pasien.filter(p => {
-        if (dashboardFilter === 'PENDING_MED' && countPendingMedsForPatient(p) === 0) return false;
-        if (dashboardFilter === 'AB_TF' && (p.antibiotik || []).length === 0 && (p.transfusi || []).length === 0) return false;
-        if (!query) return true;
-        const medMatch = (p.obat || []).some(o => o.nama.toLowerCase().includes(query));
-        return (
-          p.nama.toLowerCase().includes(query) ||
-          (p.no_rm || '').toLowerCase().includes(query) ||
-          p.bed.toLowerCase().includes(query) ||
-          p.dpjp.toLowerCase().includes(query) ||
-          p.diagnosa.toLowerCase().includes(query) ||
-          medMatch
-        );
+    function toggleModalKpCheck(rowId) {
+      const cb = document.getElementById(`cb-kp-${rowId}`);
+      const shifts = ['pagi', 'siang', 'malam'];
+      shifts.forEach(sh => {
+        const scb = document.getElementById(`cb-${sh}-${rowId}`);
+        const sinp = document.getElementById(`in-${sh}-${rowId}`);
+        if (cb && cb.checked) {
+          if (scb) scb.checked = false;
+          if (sinp) sinp.value = sh === 'pagi' ? 'K/P' : '';
+        } else if (sinp && sinp.value === 'K/P') {
+          sinp.value = '';
+        }
       });
+    }
 
-      document.getElementById('patient-filter-info').textContent = `${filtered.length} Pasien ditampilkan`;
-
-      const tbody = document.getElementById('dashboard-patient-tbody');
-      if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="py-10 text-center text-slate-400">Belum ada pasien. Klik "+ Tambah Pasien" di sidebar kiri.</td></tr>`;
-        return;
+    function addModalMedRow(medData = null) {
+      const container = document.getElementById('modal-meds-container');
+      const rowId = generateUUID();
+      const nama = medData ? (medData.nama || '') : '';
+      const rawDosis = medData ? (medData.dosis || '') : '';
+      const ruteList = ['Oral', 'IV', 'IM', 'SC', 'Drip', 'Inhalasi', 'Topikal'];
+      let detectedRute = 'Oral';
+      let cleanDosis = rawDosis;
+      for (const r of ruteList) {
+        const regex = new RegExp(`\\s*\\(${r}\\)$|\\s+${r}$`, 'i');
+        if (regex.test(rawDosis)) {
+          detectedRute = r;
+          cleanDosis = rawDosis.replace(regex, '').trim();
+          break;
+        }
       }
 
-      tbody.innerHTML = filtered.map(p => {
-        const isSelected = p.id === selectedPatientId;
-        const pendingMeds = countPendingMedsForPatient(p);
-        const totalKolf = (p.transfusi || []).reduce((s, t) => s + Number(t.kolf || 0), 0);
-        const vaso = state.vasoaktif.find(v => v.pasien_id === p.id);
+      const pagi = medData ? (medData.pagi || '') : '';
+      const siang = medData ? (medData.siang || '') : '';
+      const malam = medData ? (medData.malam || '') : '';
+      const isKp = Boolean(medData && (medData.is_kp || pagi === 'K/P'));
+      const isAb = Boolean(medData && medData.is_ab);
+      const abHari = medData && medData.hari_ke ? medData.hari_ke : 1;
 
-        return `
-          <tr onclick="selectPatientDetail('${p.id}')" class="cursor-pointer ${isSelected ? 'row-selected' : ''}">
-            <td class="py-3.5 px-3">
-              <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl ${isSelected ? 'bg-royal-600 text-white' : 'bg-royal-50 text-royal-700'} flex items-center justify-center font-extrabold text-xs shrink-0">
-                  ${getInitials(p.nama)}
-                </div>
-                <div>
-                  <p class="font-bold text-slate-800">${escapeHTML(p.nama)}</p>
-                  <p class="text-[11px] text-slate-400 font-mono">${escapeHTML(p.no_rm || '-')} &bull; BB ${p.bb || 60} kg &bull; <span class="font-sans">${escapeHTML(p.diagnosa)}</span></p>
-                </div>
-              </div>
-            </td>
-            <td class="py-3.5 px-3">
-              <div class="flex items-center gap-1.5">
-                <span class="px-2 py-0.5 rounded-md bg-royal-50 text-royal-700 text-[11px] font-bold">${escapeHTML(p.bed)}</span>
-                <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[11px] font-semibold">${escapeHTML(p.kelas)}</span>
-              </div>
-              <p class="text-xs text-slate-500 mt-1">${escapeHTML(p.dpjp)}</p>
-            </td>
-            <td class="py-3.5 px-3">
-              <div class="flex flex-wrap gap-1.5">
-                <span class="px-2 py-0.5 rounded-md ${pendingMeds > 0 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-700'} text-[11px] font-bold">
-                  ${(p.obat || []).length} Obat ${pendingMeds > 0 ? `(${pendingMeds} blm)` : '✓'}
-                </span>
-                ${(p.antibiotik || []).map(a => `<span class="px-2 py-0.5 rounded-md bg-orange-100 text-orange-800 text-[11px] font-bold">AB H-${a.hari_ke}</span>`).join('')}
-                ${totalKolf > 0 ? `<span class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-700 text-[11px] font-bold">${totalKolf} Kolf</span>` : ''}
-                ${vaso ? `<span class="px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 text-[11px] font-bold">${escapeHTML(vaso.jenis_obat)} ${vaso.dosis_aktif}</span>` : ''}
-              </div>
-            </td>
-            <td class="py-3.5 px-3 text-right whitespace-nowrap" onclick="event.stopPropagation()">
-              <div class="inline-flex items-center gap-1">
-                <button onclick="selectPatientDetail('${p.id}')" class="px-3 py-1.5 rounded-full bg-royal-50 hover:bg-royal-600 hover:text-white text-royal-700 text-xs font-bold transition">Detail</button>
-                <button onclick="openPatientModal('${p.id}')" class="w-8 h-8 rounded-full hover:bg-white text-slate-500 hover:text-royal-700 inline-flex items-center justify-center" title="Edit Pasien">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487z"/></svg>
-                </button>
-                <button onclick="deletePatient('${p.id}')" class="w-8 h-8 rounded-full hover:bg-white text-slate-400 hover:text-rose-600 inline-flex items-center justify-center" title="Hapus Pasien">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
+      const card = document.createElement('div');
+      card.id = `med-row-${rowId}`;
+      card.className = 'modal-med-item pl-3.5 border-l-[3px] border-royal-500 space-y-2.5 pb-3 border-b border-dashed border-slate-200';
+      card.dataset.rowId = rowId;
+
+      card.innerHTML = `
+        <div class="flex items-center gap-2">
+          <input type="text" data-field="nama" value="${escapeHTML(nama)}" placeholder="Nama obat"
+            class="flex-1 min-w-0 px-4 py-2.5 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-medium outline-none" />
+          <input type="text" data-field="dosis" value="${escapeHTML(cleanDosis)}" placeholder="Dosis"
+            class="w-28 sm:w-32 px-4 py-2.5 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-medium outline-none" />
+          <button type="button" onclick="removeModalMedRow('${rowId}')" title="Hapus obat ini"
+            class="w-10 h-10 rounded-full bg-royal-100 hover:bg-rose-100 text-royal-700 hover:text-rose-600 flex items-center justify-center shrink-0 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div>
+          <select data-field="rute"
+            class="w-full px-4 py-2.5 rounded-2xl bg-[#eef3fc] border border-royal-300 text-sm font-semibold text-slate-800 outline-none focus:border-royal-600">
+            ${ruteList.map(r => `<option value="${r}" ${r === detectedRute ? 'selected' : ''}>${r}</option>`).join('')}
+          </select>
+        </div>
+
+        <div class="space-y-2 pt-0.5">
+          <div class="flex items-center gap-3">
+            <label class="w-20 inline-flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
+              <input type="checkbox" id="cb-pagi-${rowId}" ${pagi && !isKp ? 'checked' : ''} onchange="toggleModalShiftCheck('${rowId}', 'pagi')" class="w-4 h-4 rounded border-slate-300 text-royal-600" />
+              <span>Pagi</span>
+            </label>
+            <input type="text" id="in-pagi-${rowId}" value="${escapeHTML(pagi)}" oninput="handleModalTimeInput(this, '${rowId}', 'pagi')" placeholder="Jam, mis. 09:00"
+              class="flex-1 px-4 py-2.5 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-mono outline-none" />
+          </div>
+
+          <div class="flex items-center gap-3">
+            <label class="w-20 inline-flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
+              <input type="checkbox" id="cb-siang-${rowId}" ${siang ? 'checked' : ''} onchange="toggleModalShiftCheck('${rowId}', 'siang')" class="w-4 h-4 rounded border-slate-300 text-royal-600" />
+              <span>Siang</span>
+            </label>
+            <input type="text" id="in-siang-${rowId}" value="${escapeHTML(siang)}" oninput="handleModalTimeInput(this, '${rowId}', 'siang')" placeholder="Jam, mis. 09:00"
+              class="flex-1 px-4 py-2.5 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-mono outline-none" />
+          </div>
+
+          <div class="flex items-center gap-3">
+            <label class="w-20 inline-flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
+              <input type="checkbox" id="cb-malam-${rowId}" ${malam ? 'checked' : ''} onchange="toggleModalShiftCheck('${rowId}', 'malam')" class="w-4 h-4 rounded border-slate-300 text-royal-600" />
+              <span>Malam</span>
+            </label>
+            <input type="text" id="in-malam-${rowId}" value="${escapeHTML(malam)}" oninput="handleModalTimeInput(this, '${rowId}', 'malam')" placeholder="Jam, mis. 09:00"
+              class="flex-1 px-4 py-2.5 rounded-2xl bg-[#f1f3f6] border border-transparent focus:bg-white focus:border-royal-500 text-sm font-mono outline-none" />
+          </div>
+        </div>
+
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          Ketik 4 angka per jam (0900 menjadi 09:00). Jam berikutnya langsung diteruskan: 09001700 menjadi 09:00, 17:00.
+        </p>
+
+        <div class="space-y-1.5 pt-0.5">
+          <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
+            <input type="checkbox" id="cb-kp-${rowId}" ${isKp ? 'checked' : ''} onchange="toggleModalKpCheck('${rowId}')" class="w-4 h-4 rounded border-slate-300 text-royal-600" />
+            <span>K/P (jika perlu)</span>
+          </label>
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
+              <input type="checkbox" id="cb-ab-${rowId}" ${isAb ? 'checked' : ''} onchange="document.getElementById('ab-day-box-${rowId}').classList.toggle('hidden', !this.checked)" class="w-4 h-4 rounded border-slate-300 text-amber-600" />
+              <span>Antibiotik (hitung hari pemberian)</span>
+            </label>
+            <div id="ab-day-box-${rowId}" class="${isAb ? 'inline-flex' : 'hidden'} items-center gap-1.5 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-xl">
+              <span class="text-[11px] font-bold text-amber-800">Hari ke-</span>
+              <input type="number" id="in-ab-day-${rowId}" min="1" value="${abHari}" class="w-12 px-1.5 py-0.5 rounded bg-white border border-amber-300 text-xs font-bold text-center outline-none" />
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(card);
+    }
+
+    function removeModalMedRow(rowId) {
+      const container = document.getElementById('modal-meds-container');
+      const el = document.getElementById(`med-row-${rowId}`);
+      if (el) el.remove();
+      if (container.children.length === 0) {
+        addModalMedRow();
+      }
     }
 
     function openPatientModal(patientId = null) {
       document.getElementById('edit-patient-id').value = patientId || '';
+      const medsContainer = document.getElementById('modal-meds-container');
+      medsContainer.innerHTML = '';
+
       if (patientId) {
         const p = state.pasien.find(x => x.id === patientId);
         if (!p) return;
-        document.getElementById('patient-modal-title').textContent = 'Edit Data Pasien';
+        document.getElementById('patient-modal-title').textContent = 'Edit data pasien';
         document.getElementById('p-nama').value = p.nama;
         document.getElementById('p-norm').value = p.no_rm || '';
-        document.getElementById('p-bed').value = p.bed;
-        document.getElementById('p-kelas').value = p.kelas;
+
+        const bedSelect = document.getElementById('p-bed');
+        if (![...bedSelect.options].some(o => o.value === p.bed)) {
+          const opt = document.createElement('option');
+          opt.value = p.bed;
+          opt.textContent = p.bed;
+          bedSelect.appendChild(opt);
+        }
+        bedSelect.value = p.bed;
+
+        document.getElementById('p-kelas').value = p.kelas || 'Kelas 1';
         document.getElementById('p-bb').value = p.bb || 60;
-        document.getElementById('p-dpjp').value = p.dpjp;
-        document.getElementById('p-diagnosa').value = p.diagnosa;
+        document.getElementById('p-dpjp').value = p.dpjp || '';
+        document.getElementById('p-diagnosa').value = p.diagnosa || '';
+
+        const existingMeds = p.obat || [];
+        if (existingMeds.length > 0) {
+          existingMeds.forEach(o => {
+            const matchedAb = (p.antibiotik || []).find(a => a.nama.toLowerCase().includes(o.nama.toLowerCase()));
+            addModalMedRow({
+              ...o,
+              is_ab: Boolean(o.is_ab || matchedAb),
+              hari_ke: matchedAb ? matchedAb.hari_ke : 1
+            });
+          });
+        } else {
+          addModalMedRow();
+        }
+
+        document.getElementById('p-rencana-tindakan').value = (p.tindakan || []).map(t => t.judul).join('\n');
       } else {
-        document.getElementById('patient-modal-title').textContent = 'Tambah Pasien Baru';
+        document.getElementById('patient-modal-title').textContent = 'Data pasien';
         document.getElementById('p-nama').value = '';
         document.getElementById('p-norm').value = '';
         document.getElementById('p-bed').value = '';
@@ -1938,7 +2083,10 @@
         document.getElementById('p-bb').value = 60;
         document.getElementById('p-dpjp').value = '';
         document.getElementById('p-diagnosa').value = '';
+        document.getElementById('p-rencana-tindakan').value = '';
+        addModalMedRow();
       }
+
       const m = document.getElementById('patient-modal');
       m.classList.remove('hidden');
       m.classList.add('flex');
@@ -1953,6 +2101,79 @@
     async function handleSavePatient(e) {
       e.preventDefault();
       const id = document.getElementById('edit-patient-id').value;
+      const existingPatient = id ? state.pasien.find(x => x.id === id) : null;
+
+      // Kumpulkan daftar obat dari modal
+      const collectedObat = [];
+      const collectedAntibiotik = [];
+
+      document.querySelectorAll('.modal-med-item').forEach(card => {
+        const rowId = card.dataset.rowId;
+        const nama = card.querySelector('[data-field="nama"]').value.trim();
+        if (!nama) return;
+
+        const dosisRaw = card.querySelector('[data-field="dosis"]').value.trim();
+        const rute = card.querySelector('[data-field="rute"]').value;
+        const dosisLabel = dosisRaw ? `${dosisRaw} (${rute})` : rute;
+
+        const isKp = document.getElementById(`cb-kp-${rowId}`)?.checked || false;
+        const isAb = document.getElementById(`cb-ab-${rowId}`)?.checked || false;
+        const abDay = parseInt(document.getElementById(`in-ab-day-${rowId}`)?.value, 10) || 1;
+
+        let pagi = document.getElementById(`in-pagi-${rowId}`)?.value.trim() || '';
+        let siang = document.getElementById(`in-siang-${rowId}`)?.value.trim() || '';
+        let malam = document.getElementById(`in-malam-${rowId}`)?.value.trim() || '';
+
+        if (isKp && !pagi && !siang && !malam) {
+          pagi = 'K/P';
+        }
+
+        const prevObat = existingPatient
+          ? (existingPatient.obat || []).find(o => o.nama.toLowerCase() === nama.toLowerCase())
+          : null;
+
+        collectedObat.push({
+          id: prevObat ? prevObat.id : generateUUID(),
+          nama,
+          dosis: dosisLabel,
+          pagi,
+          siang,
+          malam,
+          is_kp: isKp,
+          is_ab: isAb,
+          pagi_done: prevObat ? Boolean(prevObat.pagi_done) : false,
+          pagi_info: prevObat ? (prevObat.pagi_info || '') : '',
+          siang_done: prevObat ? Boolean(prevObat.siang_done) : false,
+          siang_info: prevObat ? (prevObat.siang_info || '') : '',
+          malam_done: prevObat ? Boolean(prevObat.malam_done) : false,
+          malam_info: prevObat ? (prevObat.malam_info || '') : ''
+        });
+
+        if (isAb) {
+          collectedAntibiotik.push({
+            id: generateUUID(),
+            nama: `${nama} ${dosisLabel}`.trim(),
+            hari_ke: abDay
+          });
+        }
+      });
+
+      // Kumpulkan rencana tindakan (satu baris = satu ceklis)
+      const rawTindakan = document.getElementById('p-rencana-tindakan').value || '';
+      const lines = rawTindakan.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const collectedTindakan = lines.map(line => {
+        const prevTd = existingPatient
+          ? (existingPatient.tindakan || []).find(t => t.judul.toLowerCase() === line.toLowerCase())
+          : null;
+        return {
+          id: prevTd ? prevTd.id : generateUUID(),
+          judul: line,
+          jam: prevTd ? (prevTd.jam || 'Rencana') : 'Rencana',
+          selesai: prevTd ? Boolean(prevTd.selesai) : false,
+          perawat: prevTd ? (prevTd.perawat || currentUser.nama) : currentUser.nama
+        };
+      });
+
       const payload = {
         nama: document.getElementById('p-nama').value.trim(),
         no_rm: document.getElementById('p-norm').value.trim(),
@@ -1960,7 +2181,10 @@
         kelas: document.getElementById('p-kelas').value,
         bb: parseFloat(document.getElementById('p-bb').value) || 60,
         dpjp: document.getElementById('p-dpjp').value.trim(),
-        diagnosa: document.getElementById('p-diagnosa').value.trim(),
+        diagnosa: document.getElementById('p-diagnosa').value.trim() || '-',
+        obat: collectedObat,
+        antibiotik: collectedAntibiotik,
+        tindakan: collectedTindakan,
         updated_at: new Date().toISOString()
       };
 
@@ -1985,7 +2209,7 @@
         const newPatient = {
           id: generateUUID(),
           ...payload,
-          obat: [], antibiotik: [], transfusi: [], tindakan: [],
+          transfusi: [],
           created_at: new Date().toISOString()
         };
         if (isSupabaseOnline && supabaseClient) {
