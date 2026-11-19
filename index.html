@@ -480,114 +480,87 @@
       <main id="main-scroll-area" class="flex-1 overflow-y-auto px-4 sm:px-7 py-6 space-y-7">
 
         <!-- ==================== PAGE 1: DAFTAR PASIEN & OBAT ==================== -->
-        <section id="page-dashboard" class="page-section space-y-7">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-              <h2 class="text-2xl font-extrabold text-royal-800 tracking-tight">Ruang Dahlia</h2>
-              <button onclick="openPatientModal()" class="w-9 h-9 rounded-xl bg-royal-600 hover:bg-royal-700 text-white flex items-center justify-center shadow-sm transition" title="Tambah Pasien Baru">
+        <section id="page-dashboard" class="page-section space-y-6">
+          <!-- Estetik Header Greeting & Tanggal -->
+          <div class="rounded-[26px] bg-gradient-to-r from-[#eef4fc] via-[#f7faff] to-[#eef4fc] border border-royal-100/90 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-royal-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-royal-600/20 shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+              </div>
+              <div>
+                <h2 id="dashboard-greeting-title" class="text-lg sm:text-xl font-extrabold text-royal-900 tracking-tight leading-snug">Halo, Perawat!</h2>
+                <p id="dashboard-sub-greeting" class="text-xs font-semibold text-slate-500 mt-0.5">R. Dahlia &bull; <span id="dashboard-date-label">-</span></p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 self-end sm:self-center">
+              <button onclick="openPatientModal()" class="px-4 py-2 rounded-full bg-royal-600 hover:bg-royal-700 text-white text-xs font-bold shadow-sm transition inline-flex items-center gap-1.5">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                <span>Pasien Baru</span>
+              </button>
+              <button onclick="navigateTo('recap')" class="w-9 h-9 rounded-full bg-white hover:bg-royal-50 text-royal-700 border border-slate-200/80 flex items-center justify-center transition" title="Cetak Kardek">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5z"/></svg>
               </button>
             </div>
-            <span id="dashboard-date-label" class="text-xs font-semibold text-slate-500 bg-[#f3f6fb] px-3.5 py-2 rounded-xl w-fit">-</span>
           </div>
 
-          <!-- 4 AKSES CEPAT FOLDER CARDS -->
-          <div>
-            <h3 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-[0.14em] mb-3.5">Akses Cepat</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-              <div onclick="setDashboardFilter('ALL')" id="qa-card-all" class="folder-card active-blue">
-                <div class="folder-tab"></div>
-                <div class="folder-body">
-                  <div>
-                    <p class="text-[10px] font-bold uppercase tracking-wider text-blue-200">Pasien Dirawat</p>
-                    <div id="qa-avatars-patients" class="flex items-center -space-x-2 mt-2.5"></div>
-                  </div>
-                  <div class="mt-4 flex items-end justify-between">
-                    <div>
-                      <p class="text-[10px] uppercase tracking-wider text-blue-200 font-semibold">Folder Utama</p>
-                      <p class="text-sm font-extrabold text-white mt-0.5">Pasien Aktif</p>
-                    </div>
-                    <span id="qa-count-patients" class="text-xl font-extrabold text-white">0</span>
-                  </div>
-                </div>
+          <!-- JADWAL OBAT HARI INI (FILTER SHIFT + LEGENDA WARNA) -->
+          <div class="space-y-3.5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2.5">
+                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">Jadwal obat hari ini</h3>
+                <button id="clear-filter-btn" onclick="setDashboardFilter('ALL')" class="hidden text-[11px] font-bold text-royal-600 bg-royal-50 px-2.5 py-0.5 rounded-full">Reset</button>
               </div>
+              <span id="patient-filter-info" class="text-xs font-semibold text-slate-400"></span>
+            </div>
 
-              <div onclick="setDashboardFilter('PENDING_MED')" id="qa-card-pending" class="folder-card soft-gray">
-                <div class="folder-tab"></div>
-                <div class="folder-body">
-                  <div>
-                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Jadwal Obat</p>
-                    <div id="qa-avatars-pending" class="flex items-center -space-x-2 mt-2.5"></div>
-                  </div>
-                  <div class="mt-4 flex items-end justify-between">
-                    <div>
-                      <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Perlu Diberikan</p>
-                      <p class="text-sm font-extrabold text-royal-800 mt-0.5">Obat Belum Diberikan</p>
-                    </div>
-                    <span id="qa-count-pending" class="text-xl font-extrabold text-royal-600">0</span>
-                  </div>
-                </div>
-              </div>
+            <!-- Shift Filter Pills -->
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" onclick="setShiftFilter('ALL')" data-sfilter="ALL" class="shift-pill px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition shadow-xs">
+                Semua (<span id="count-shift-all">0</span>)
+              </button>
+              <button type="button" onclick="setShiftFilter('pagi')" data-sfilter="pagi" class="shift-pill px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition">
+                Pagi (<span id="count-shift-pagi">0</span>)
+              </button>
+              <button type="button" onclick="setShiftFilter('siang')" data-sfilter="siang" class="shift-pill px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition">
+                Siang (<span id="count-shift-siang">0</span>)
+              </button>
+              <button type="button" onclick="setShiftFilter('malam')" data-sfilter="malam" class="shift-pill px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition">
+                Malam (<span id="count-shift-malam">0</span>)
+              </button>
+            </div>
 
-              <div onclick="setDashboardFilter('AB_TF')" id="qa-card-abtf" class="folder-card soft-gray">
-                <div class="folder-tab"></div>
-                <div class="folder-body">
-                  <div>
-                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Terapi Khusus</p>
-                    <div id="qa-avatars-abtf" class="flex items-center -space-x-2 mt-2.5"></div>
-                  </div>
-                  <div class="mt-4 flex items-end justify-between">
-                    <div>
-                      <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Pantauan Khusus</p>
-                      <p class="text-sm font-extrabold text-royal-800 mt-0.5">Antibiotik / Transfusi</p>
-                    </div>
-                    <span id="qa-count-abtf" class="text-xl font-extrabold text-royal-600">0</span>
-                  </div>
-                </div>
-              </div>
-
-              <div onclick="navigateTo('vascon')" class="folder-card soft-gray">
-                <div class="folder-tab"></div>
-                <div class="folder-body">
-                  <div>
-                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Titrasi & Cairan</p>
-                    <div id="qa-avatars-vasobal" class="flex items-center -space-x-2 mt-2.5"></div>
-                  </div>
-                  <div class="mt-4 flex items-end justify-between">
-                    <div>
-                      <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Pemantauan</p>
-                      <p class="text-sm font-extrabold text-royal-800 mt-0.5">Vasoaktif / Balance</p>
-                    </div>
-                    <span id="qa-count-vasobal" class="text-xl font-extrabold text-royal-600">0</span>
-                  </div>
-                </div>
-              </div>
+            <!-- Category Legend Dots -->
+            <div class="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs font-semibold text-slate-600 pt-0.5">
+              <span class="inline-flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                <span>Injeksi</span>
+              </span>
+              <span class="inline-flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                <span>Oral</span>
+              </span>
+              <span class="inline-flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <span>Cairan / Drip / Pump</span>
+              </span>
             </div>
           </div>
 
-          <!-- DAFTAR PASIEN TABLE -->
-          <div>
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-              <div class="flex items-center gap-2">
-                <h3 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-[0.14em]">Daftar Pasien Ruang Dahlia</h3>
-                <button id="clear-filter-btn" onclick="setDashboardFilter('ALL')" class="hidden text-[11px] font-bold text-royal-600 bg-royal-50 px-2.5 py-0.5 rounded-full">Reset Filter</button>
-              </div>
-              <span id="patient-filter-info" class="text-xs text-slate-400 font-medium"></span>
-            </div>
+          <!-- KARTU PASIEN & DAFTAR OBAT ESTETIK -->
+          <div id="dashboard-schedule-cards" class="space-y-5"></div>
 
-            <div class="overflow-x-auto">
-              <table class="w-full text-left drive-table min-w-[740px]">
-                <thead>
-                  <tr class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    <th class="py-2.5 px-3">Pasien & No RM</th>
-                    <th class="py-2.5 px-3">Kamar / Kelas / DPJP</th>
-                    <th class="py-2.5 px-3">Ringkasan Terapi & Infus</th>
-                    <th class="py-2.5 px-3 text-right">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="dashboard-patient-tbody" class="text-sm"></tbody>
-              </table>
-            </div>
+          <!-- Hidden legacy table references kept safely if needed -->
+          <div class="hidden">
+            <div id="qa-count-patients"></div>
+            <div id="qa-avatars-patients"></div>
+            <div id="qa-count-pending"></div>
+            <div id="qa-avatars-pending"></div>
+            <div id="qa-count-abtf"></div>
+            <div id="qa-avatars-abtf"></div>
+            <div id="qa-count-vasobal"></div>
+            <div id="qa-avatars-vasobal"></div>
+            <table><tbody id="dashboard-patient-tbody"></tbody></table>
           </div>
 
           <!-- ==================== PANEL DETAIL PASIEN ==================== -->
@@ -967,7 +940,7 @@
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 no-print">
             <h2 class="text-2xl font-extrabold text-royal-800 tracking-tight">Rekap & Cetak Obat Keseluruhan</h2>
             <button onclick="window.print()" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-royal-600 hover:bg-royal-700 text-white text-sm font-bold shadow-md transition">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659"/></svg>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5z"/></svg>
               <span>Cetak Rekap / Simpan PDF</span>
             </button>
           </div>
@@ -1104,10 +1077,9 @@
     <option value="Futrolit 500 ml"></option>
   </datalist>
 
-  <!-- ==================== MODAL DATA PASIEN (PROFESIONAL + OBAT + INFUS + RENCANA TINDAKAN) ==================== -->
+  <!-- ==================== MODAL DATA PASIEN ==================== -->
   <div id="patient-modal" class="fixed inset-0 z-[65] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-3 sm:p-5 no-print">
     <div class="bg-[#f8fafc] rounded-[28px] shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200/80">
-      <!-- Professional Medical Header -->
       <div class="px-6 py-4 bg-gradient-to-r from-[#1c54b2] to-[#2563c9] text-white flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center">
@@ -1123,7 +1095,6 @@
         </button>
       </div>
 
-      <!-- Scrollable Form Body -->
       <form onsubmit="handleSavePatient(event)" class="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
         <input type="hidden" id="edit-patient-id" />
 
@@ -1169,7 +1140,6 @@
             </div>
           </div>
 
-          <!-- Detail Klinis Tambahan (Opsional / Ringkas) -->
           <details class="group pt-1">
             <summary class="text-xs font-bold text-royal-600 cursor-pointer hover:text-royal-800 select-none flex items-center gap-1.5">
               <span>+ Info klinis tambahan (No. RM, Kelas, BB, Diagnosa)</span>
@@ -1293,6 +1263,8 @@
     let currentUser = null;
     let currentPage = 'dashboard';
     let dashboardFilter = 'ALL';
+    let activeShiftFilter = 'ALL';
+    let collapsedPatientIds = new Set();
     let selectedPatientId = null;
     let currentDetailTab = 'obat';
     let currentVasoDrug = 'Vascon';
@@ -1376,7 +1348,7 @@
     }
 
     // =========================================================================
-    // 4. INFUS DATA HELPERS (TERSIMPAN AMAN DI JSONB TINDAKAN SUPABASE)
+    // 4. INFUS DATA HELPERS
     // =========================================================================
     function getPatientInfusList(p) {
       const rawList = Array.isArray(p.tindakan) ? p.tindakan : [];
@@ -1424,7 +1396,6 @@
     // 5. DEFAULT LOCAL DATA (FALLBACK MODE)
     // =========================================================================
     function getDefaultLocalState() {
-      const today = getTodayISO();
       const p1Id = generateUUID();
       return {
         perawat: [
@@ -1846,10 +1817,26 @@
       const jabatan = document.getElementById('reg-jabatan').value;
       const password = document.getElementById('reg-password').value;
 
+      if (!username) return showToast('Username tidak boleh kosong.', 'error');
+
       const newUser = { id: generateUUID(), username, password, nama, jabatan };
 
       if (isSupabaseOnline && supabaseClient) {
         try {
+          const { data: existingUser, error: checkError } = await supabaseClient
+            .from('perawat')
+            .select('id, username')
+            .ilike('username', username)
+            .maybeSingle();
+          if (checkError) throw checkError;
+
+          if (existingUser) {
+            return showToast(
+              `Username "${username}" sudah terdaftar. Silakan masuk di tab "Masuk Perawat".`,
+              'error'
+            );
+          }
+
           const { data, error } = await supabaseClient.from('perawat').insert([newUser]).select().single();
           if (error) throw error;
           saveSession(data);
@@ -1859,7 +1846,7 @@
         }
       } else {
         if (state.perawat.some(u => u.username.toLowerCase() === username)) {
-          return showToast('Username sudah terdaftar.', 'error');
+          return showToast(`Username "${username}" sudah terdaftar.`, 'error');
         }
         state.perawat.push({ ...newUser, created_at: new Date().toISOString() });
         saveLocalState();
@@ -1902,6 +1889,13 @@
       document.getElementById('header-nurse-name').textContent = currentUser.nama;
       document.getElementById('header-nurse-role').textContent = currentUser.jabatan || 'Perawat';
       document.getElementById('header-nurse-avatar').textContent = getInitials(currentUser.nama);
+
+      const greetTitle = document.getElementById('dashboard-greeting-title');
+      if (greetTitle) {
+        const shortFirst = (currentUser.nama || 'Perawat').replace(/^(Ns\.|dr\.)\s*/i, '').split(',')[0].trim();
+        greetTitle.textContent = `Halo, ${shortFirst || 'Perawat'}!`;
+      }
+
       document.getElementById('dashboard-date-label').textContent = formatDateIndo(new Date());
       document.getElementById('bal-date').value = getTodayISO();
 
@@ -2018,8 +2012,23 @@
       renderDashboard();
     }
 
+    function setShiftFilter(shiftKey) {
+      activeShiftFilter = shiftKey;
+      renderDashboard();
+    }
+
+    function toggleCollapsePatientCard(patientId, event) {
+      if (event) event.stopPropagation();
+      if (collapsedPatientIds.has(patientId)) {
+        collapsedPatientIds.delete(patientId);
+      } else {
+        collapsedPatientIds.add(patientId);
+      }
+      renderDashboard();
+    }
+
     // =========================================================================
-    // 9. DASHBOARD & PASIEN CRUD (MODAL PROFESIONAL + OBAT + INFUS)
+    // 9. DASHBOARD & PASIEN CRUD (KARTU OBAT ESTETIK + SUPABASE)
     // =========================================================================
     function countPendingMedsForPatient(p) {
       let pending = 0;
@@ -2031,104 +2040,307 @@
       return pending;
     }
 
-    function renderDashboard() {
-      const pendingPatients = state.pasien.filter(p => countPendingMedsForPatient(p) > 0);
-      const totalPendingCount = state.pasien.reduce((sum, p) => sum + countPendingMedsForPatient(p), 0);
-      const abTfPatients = state.pasien.filter(p => (p.antibiotik || []).length > 0 || (p.transfusi || []).length > 0);
-      const vasoBalIds = new Set([
-        ...state.vasoaktif.map(v => v.pasien_id),
-        ...state.balance_cairan.map(b => b.pasien_id)
-      ]);
-      const vasoBalPatients = state.pasien.filter(p => vasoBalIds.has(p.id));
+    function classifyMedicationRoute(o) {
+      const text = `${o.rute || ''} ${o.dosis || ''} ${o.nama || ''}`.toLowerCase();
+      if (text.includes('drip') || text.includes('pump') || text.includes('cairan') || text.includes('infus') || text.includes('nacl') || text.includes('rl')) {
+        return { key: 'cairan', label: 'Cairan / Drip / Pump', dotClass: 'bg-emerald-500', textClass: 'text-emerald-600', badgeBg: 'bg-emerald-50 text-emerald-700 border-emerald-200/80' };
+      }
+      if (text.includes('iv') || text.includes('im') || text.includes('sc') || text.includes('inj') || text.includes('injeksi')) {
+        return { key: 'injeksi', label: 'Injeksi', dotClass: 'bg-rose-500', textClass: 'text-rose-600', badgeBg: 'bg-rose-50 text-rose-700 border-rose-200/80' };
+      }
+      return { key: 'oral', label: 'Oral', dotClass: 'bg-blue-500', textClass: 'text-blue-600', badgeBg: 'bg-blue-50 text-blue-700 border-blue-200/80' };
+    }
 
-      document.getElementById('qa-count-patients').textContent = state.pasien.length;
-      document.getElementById('qa-avatars-patients').innerHTML = renderAvatarStack(state.pasien, 'ring-[#2563c9]');
+    function buildPatientMedicationRows(p) {
+      const rows = [];
+      (p.obat || []).forEach(o => {
+        const cat = classifyMedicationRoute(o);
+        const shiftDefs = [
+          { sh: 'pagi', label: 'Pagi', time: (o.pagi || '').trim(), done: Boolean(o.pagi_done), info: o.pagi_info || '' },
+          { sh: 'siang', label: 'Siang', time: (o.siang || '').trim(), done: Boolean(o.siang_done), info: o.siang_info || '' },
+          { sh: 'malam', label: 'Malam', time: (o.malam || '').trim(), done: Boolean(o.malam_done), info: o.malam_info || '' }
+        ].filter(item => item.time.length > 0);
 
-      document.getElementById('qa-count-pending').textContent = totalPendingCount;
-      document.getElementById('qa-avatars-pending').innerHTML = renderAvatarStack(pendingPatients, 'ring-[#f3f6fb]');
-
-      document.getElementById('qa-count-abtf').textContent = abTfPatients.length;
-      document.getElementById('qa-avatars-abtf').innerHTML = renderAvatarStack(abTfPatients, 'ring-[#f3f6fb]');
-
-      document.getElementById('qa-count-vasobal').textContent = vasoBalPatients.length;
-      document.getElementById('qa-avatars-vasobal').innerHTML = renderAvatarStack(vasoBalPatients, 'ring-[#f3f6fb]');
-
-      const query = (document.getElementById('global-search').value || '').trim().toLowerCase();
-      let filtered = state.pasien.filter(p => {
-        if (dashboardFilter === 'PENDING_MED' && countPendingMedsForPatient(p) === 0) return false;
-        if (dashboardFilter === 'AB_TF' && (p.antibiotik || []).length === 0 && (p.transfusi || []).length === 0) return false;
-        if (!query) return true;
-        const medMatch = (p.obat || []).some(o => o.nama.toLowerCase().includes(query));
-        const infusMatch = getPatientInfusList(p).some(inf => inf.cairan.toLowerCase().includes(query));
-        return (
-          p.nama.toLowerCase().includes(query) ||
-          (p.no_rm || '').toLowerCase().includes(query) ||
-          p.bed.toLowerCase().includes(query) ||
-          p.dpjp.toLowerCase().includes(query) ||
-          p.diagnosa.toLowerCase().includes(query) ||
-          medMatch ||
-          infusMatch
-        );
+        if (shiftDefs.length > 0) {
+          shiftDefs.forEach(sd => {
+            rows.push({
+              kind: 'scheduled',
+              obatId: o.id,
+              shift: sd.sh,
+              shiftLabel: sd.label,
+              timeLabel: sd.time,
+              title: `${o.nama}${o.dosis ? ' ' + o.dosis : ''}`,
+              cat,
+              done: sd.done,
+              givenInfo: sd.info,
+              isKp: Boolean(o.kp),
+              isOta: Boolean(o.ota)
+            });
+          });
+        } else if (o.kp) {
+          rows.push({
+            kind: 'kp',
+            obatId: o.id,
+            shift: 'pagi',
+            shiftLabel: 'K/P',
+            timeLabel: 'K/P',
+            title: `${o.nama}${o.dosis ? ' ' + o.dosis : ''}`,
+            cat,
+            done: Boolean(o.pagi_done),
+            givenInfo: o.pagi_info || '',
+            isKp: true,
+            isOta: Boolean(o.ota)
+          });
+        } else {
+          rows.push({
+            kind: 'unscheduled',
+            obatId: o.id,
+            shift: 'pagi',
+            shiftLabel: 'Jadwal',
+            timeLabel: '--:--',
+            title: `${o.nama}${o.dosis ? ' ' + o.dosis : ''}`,
+            cat,
+            done: Boolean(o.pagi_done),
+            givenInfo: o.pagi_info || '',
+            isKp: false,
+            isOta: Boolean(o.ota)
+          });
+        }
       });
 
-      document.getElementById('patient-filter-info').textContent = `${filtered.length} Pasien ditampilkan`;
+      // Sertakan cairan infus aktif jika belum ada di daftar obat
+      const activeInfus = getPatientInfusList(p).filter(inf => inf.aktif);
+      activeInfus.forEach(inf => {
+        rows.push({
+          kind: 'infus',
+          infusId: inf.id,
+          shift: 'cairan',
+          shiftLabel: 'Infus',
+          timeLabel: 'Cairan',
+          title: `${inf.cairan} • ${inf.tetesan} (Kolf ${inf.kolf_ke})`,
+          cat: { key: 'cairan', label: 'Cairan / Drip / Pump', dotClass: 'bg-emerald-500', textClass: 'text-emerald-600', badgeBg: 'bg-emerald-50 text-emerald-700 border-emerald-200/80' },
+          done: false,
+          givenInfo: inf.jam || '',
+          isKp: false,
+          isOta: false
+        });
+      });
 
-      const tbody = document.getElementById('dashboard-patient-tbody');
-      if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="py-10 text-center text-slate-400">Tidak ada pasien ditemukan.</td></tr>`;
+      return rows;
+    }
+
+    async function toggleScheduleItemDone(patientId, obatId, shift) {
+      const p = state.pasien.find(x => x.id === patientId);
+      if (!p) return;
+      const o = (p.obat || []).find(x => x.id === obatId);
+      if (!o) return;
+      const next = !o[`${shift}_done`];
+      o[`${shift}_done`] = next;
+      o[`${shift}_info`] = next ? `${currentUser ? currentUser.nama : 'Perawat'} • ${getNowTime()}` : '';
+      await persistPatientJsonFields(p, next ? `${o.nama} ditandai Selesai.` : `${o.nama} dikembalikan ke Menunggu.`);
+    }
+
+    async function toggleOtaFlag(patientId, obatId, checked) {
+      const p = state.pasien.find(x => x.id === patientId);
+      if (!p) return;
+      const o = (p.obat || []).find(x => x.id === obatId);
+      if (!o) return;
+      o.ota = checked;
+      await persistPatientJsonFields(p, checked ? `${o.nama} ditandai OTA.` : null);
+    }
+
+    function renderDashboard() {
+      // Hitung jumlah jadwal per shift di seluruh pasien
+      let totalAll = 0;
+      let totalPagi = 0;
+      let totalSiang = 0;
+      let totalMalam = 0;
+
+      state.pasien.forEach(p => {
+        const rows = buildPatientMedicationRows(p);
+        totalAll += rows.length;
+        totalPagi += rows.filter(r => r.shift === 'pagi').length;
+        totalSiang += rows.filter(r => r.shift === 'siang').length;
+        totalMalam += rows.filter(r => r.shift === 'malam').length;
+      });
+
+      const elAll = document.getElementById('count-shift-all');
+      const elPagi = document.getElementById('count-shift-pagi');
+      const elSiang = document.getElementById('count-shift-siang');
+      const elMalam = document.getElementById('count-shift-malam');
+      if (elAll) elAll.textContent = totalAll;
+      if (elPagi) elPagi.textContent = totalPagi;
+      if (elSiang) elSiang.textContent = totalSiang;
+      if (elMalam) elMalam.textContent = totalMalam;
+
+      // Update gaya tombol pill shift aktif
+      document.querySelectorAll('.shift-pill').forEach(btn => {
+        const isActive = btn.dataset.sfilter === activeShiftFilter;
+        btn.className = isActive
+          ? 'shift-pill px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-[#6346d9] text-white shadow-md shadow-indigo-900/15 transition'
+          : 'shift-pill px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-[#f1f4f9] text-slate-600 hover:bg-royal-50 hover:text-royal-800 transition';
+      });
+
+      const query = (document.getElementById('global-search').value || '').trim().toLowerCase();
+      const cardsContainer = document.getElementById('dashboard-schedule-cards');
+      const filterInfo = document.getElementById('patient-filter-info');
+
+      const patientBlocks = state.pasien
+        .map(p => {
+          const allRows = buildPatientMedicationRows(p);
+          const filteredRows = allRows.filter(r => {
+            if (activeShiftFilter !== 'ALL' && r.shift !== activeShiftFilter) return false;
+            if (!query) return true;
+            return (
+              p.nama.toLowerCase().includes(query) ||
+              (p.bed || '').toLowerCase().includes(query) ||
+              (p.dpjp || '').toLowerCase().includes(query) ||
+              r.title.toLowerCase().includes(query) ||
+              r.cat.label.toLowerCase().includes(query)
+            );
+          });
+
+          const matchesPatientMeta =
+            query &&
+            (p.nama.toLowerCase().includes(query) ||
+              (p.bed || '').toLowerCase().includes(query) ||
+              (p.dpjp || '').toLowerCase().includes(query));
+
+          const rowsToRender = filteredRows.length > 0 ? filteredRows : (matchesPatientMeta && activeShiftFilter === 'ALL' ? allRows : []);
+          return { patient: p, allRows, rowsToRender };
+        })
+        .filter(item => {
+          if (activeShiftFilter !== 'ALL') return item.rowsToRender.length > 0;
+          if (query) return item.rowsToRender.length > 0;
+          return true;
+        });
+
+      const visibleItemCount = patientBlocks.reduce((sum, b) => sum + b.rowsToRender.length, 0);
+      if (filterInfo) {
+        filterInfo.textContent = `${patientBlocks.length} Pasien • ${visibleItemCount} Item Obat`;
+      }
+
+      if (patientBlocks.length === 0) {
+        cardsContainer.innerHTML = `
+          <div class="rounded-[26px] border border-dashed border-slate-200 bg-[#f8faff] p-10 text-center space-y-2">
+            <p class="text-sm font-bold text-slate-600">Tidak ada jadwal obat sesuai filter saat ini.</p>
+            <p class="text-xs text-slate-400">Coba pilih filter "Semua" atau klik tombol "+ Pasien Baru".</p>
+          </div>
+        `;
         return;
       }
 
-      tbody.innerHTML = filtered.map(p => {
-        const isSelected = p.id === selectedPatientId;
-        const pendingMeds = countPendingMedsForPatient(p);
-        const totalKolf = (p.transfusi || []).reduce((s, t) => s + Number(t.kolf || 0), 0);
-        const activeInfus = getPatientInfusList(p).filter(inf => inf.aktif);
-        const vaso = state.vasoaktif.find(v => v.pasien_id === p.id);
+      cardsContainer.innerHTML = patientBlocks.map(({ patient: p, allRows, rowsToRender }) => {
+        const isCollapsed = collapsedPatientIds.has(p.id);
+        const doneCount = allRows.filter(r => r.done).length;
+        const kpCount = (p.obat || []).filter(o => o.kp).length;
+        const noTimeCount = (p.obat || []).filter(o => !o.pagi && !o.siang && !o.malam && !o.kp).length;
+
+        const metaParts = [`${doneCount}/${allRows.length} jadwal`];
+        if (kpCount > 0) metaParts.push(`${kpCount} K/P`);
+        if (noTimeCount > 0) metaParts.push(`${noTimeCount} tanpa jam`);
+
+        const rowsHtml = rowsToRender.length === 0
+          ? `<div class="p-6 text-center text-xs text-slate-400">Belum ada jadwal obat yang tercatat untuk pasien ini.</div>`
+          : rowsToRender.map(r => {
+              let leftBoxClass = 'bg-blue-50 text-blue-700 border-blue-100';
+              if (r.kind === 'kp') leftBoxClass = 'bg-slate-100 text-slate-600 border-slate-200';
+              else if (r.cat.key === 'injeksi') leftBoxClass = 'bg-rose-50/90 text-rose-700 border-rose-100';
+              else if (r.cat.key === 'cairan') leftBoxClass = 'bg-emerald-50/90 text-emerald-700 border-emerald-100';
+
+              let statusBadgeHtml = '';
+              if (r.isKp) {
+                statusBadgeHtml = `<span class="px-3 py-1 rounded-full bg-amber-100/90 text-amber-800 text-[11px] font-extrabold">K/P</span>`;
+              } else if (r.done) {
+                statusBadgeHtml = `<span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-extrabold">Selesai</span>`;
+              } else {
+                statusBadgeHtml = `<span class="px-3 py-1 rounded-full bg-amber-100/90 text-amber-800 text-[11px] font-extrabold">Menunggu</span>`;
+              }
+
+              const subLineText = r.isKp
+                ? `${r.cat.label} &bull; jika perlu`
+                : r.kind === 'infus'
+                  ? `${r.cat.label}${r.givenInfo ? ` &bull; ${r.givenInfo}` : ''}`
+                  : `${r.cat.label} &bull; ${r.shiftLabel}${r.done && r.givenInfo ? ` &bull; ${r.givenInfo}` : ''}`;
+
+              const actionBtnHtml = r.kind === 'infus'
+                ? `<button type="button" onclick="selectPatientDetail('${p.id}'); switchDetailTab('infus');" class="w-10 h-10 rounded-2xl bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white flex items-center justify-center transition shrink-0" title="Kelola Infus">
+                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+                   </button>`
+                : r.done
+                  ? `<button type="button" onclick="toggleScheduleItemDone('${p.id}', '${r.obatId}', '${r.shift}')" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-amber-100 text-slate-500 hover:text-amber-700 flex items-center justify-center transition shrink-0" title="Batalkan / Ulangi">
+                       <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>
+                     </button>`
+                  : `<button type="button" onclick="toggleScheduleItemDone('${p.id}', '${r.obatId}', '${r.shift}')" class="w-10 h-10 rounded-2xl bg-indigo-50/90 hover:bg-[#6346d9] text-[#6346d9] hover:text-white flex items-center justify-center transition shrink-0 shadow-2xs" title="Tandai Sudah Diberikan">
+                       <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                     </button>`;
+
+              return `
+                <div class="px-4 sm:px-5 py-3.5 flex items-center justify-between gap-3 hover:bg-[#f8faff] transition ${r.done ? 'bg-slate-50/45' : 'bg-white'}">
+                  <div class="flex items-center gap-3.5 min-w-0 flex-1">
+                    <div class="w-14 h-12 rounded-2xl border ${leftBoxClass} flex items-center justify-center font-mono font-extrabold text-xs shrink-0">
+                      ${escapeHTML(r.timeLabel)}
+                    </div>
+                    <div class="min-w-0">
+                      <p class="font-extrabold text-xs sm:text-sm uppercase tracking-tight truncate ${r.done ? 'text-slate-600' : 'text-slate-900'}">
+                        ${escapeHTML(r.title)}
+                      </p>
+                      <p class="text-xs font-semibold mt-0.5 truncate ${r.cat.textClass}">
+                        ${subLineText}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-2.5 sm:gap-3 shrink-0">
+                    <div class="flex flex-col items-end gap-1">
+                      ${statusBadgeHtml}
+                      ${r.kind !== 'infus' ? `
+                        <label class="inline-flex items-center gap-1.5 cursor-pointer select-none text-[11px] font-bold text-slate-400 hover:text-slate-600">
+                          <input type="checkbox" ${r.isOta ? 'checked' : ''} onchange="toggleOtaFlag('${p.id}', '${r.obatId}', this.checked)" class="w-3.5 h-3.5 rounded border-slate-300 text-royal-600" />
+                          <span>OTA</span>
+                        </label>
+                      ` : ''}
+                    </div>
+                    ${actionBtnHtml}
+                  </div>
+                </div>
+              `;
+            }).join('');
 
         return `
-          <tr onclick="selectPatientDetail('${p.id}')" class="cursor-pointer ${isSelected ? 'row-selected' : ''}">
-            <td class="py-3.5 px-3">
-              <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl ${isSelected ? 'bg-royal-600 text-white' : 'bg-royal-50 text-royal-700'} flex items-center justify-center font-extrabold text-xs shrink-0">
-                  ${getInitials(p.nama)}
+          <div class="rounded-[26px] bg-white border border-slate-200/80 shadow-[0_10px_28px_-14px_rgba(30,58,138,0.18)] overflow-hidden">
+            <!-- Patient Header Banner (Estetik Indigo-Royal Gradient) -->
+            <div onclick="toggleCollapsePatientCard('${p.id}', event)" class="cursor-pointer bg-gradient-to-r from-[#5f43d6] via-[#5346de] to-[#2563c9] px-4 sm:px-5 py-3.5 text-white flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="px-3 py-2 rounded-2xl bg-white text-[#5346de] font-extrabold text-xs sm:text-sm shadow-xs shrink-0">
+                  ${escapeHTML(p.bed || '-')}
                 </div>
-                <div>
-                  <p class="font-bold text-slate-800">${escapeHTML(p.nama)}</p>
-                  <p class="text-[11px] text-slate-400 font-mono">${escapeHTML(p.no_rm || '-')} &bull; BB ${p.bb || 60} kg &bull; <span class="font-sans">${escapeHTML(p.diagnosa)}</span></p>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-sm sm:text-base uppercase tracking-wide truncate">${escapeHTML(p.nama)}</h4>
+                  <p class="text-[11px] sm:text-xs text-indigo-100/95 font-medium truncate mt-0.5">
+                    ${escapeHTML(p.dpjp || 'DPJP -')} &bull; ${escapeHTML(metaParts.join(' &bull; '))}
+                  </p>
                 </div>
               </div>
-            </td>
-            <td class="py-3.5 px-3">
-              <div class="flex items-center gap-1.5">
-                <span class="px-2 py-0.5 rounded-md bg-royal-50 text-royal-700 text-[11px] font-bold">${escapeHTML(p.bed)}</span>
-                <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[11px] font-semibold">${escapeHTML(p.kelas)}</span>
-              </div>
-              <p class="text-xs text-slate-500 mt-1">${escapeHTML(p.dpjp)}</p>
-            </td>
-            <td class="py-3.5 px-3">
-              <div class="flex flex-wrap gap-1.5">
-                <span class="px-2 py-0.5 rounded-md ${pendingMeds > 0 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-700'} text-[11px] font-bold">
-                  ${(p.obat || []).length} Obat ${pendingMeds > 0 ? `(${pendingMeds} blm)` : '✓'}
-                </span>
-                ${activeInfus.map(inf => `<span class="px-2 py-0.5 rounded-md bg-sky-100 text-sky-800 text-[11px] font-bold">Infus: ${escapeHTML(inf.cairan)} (${escapeHTML(inf.tetesan)})</span>`).join('')}
-                ${(p.antibiotik || []).map(a => `<span class="px-2 py-0.5 rounded-md bg-orange-100 text-orange-800 text-[11px] font-bold">AB H-${a.hari_ke}</span>`).join('')}
-                ${totalKolf > 0 ? `<span class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-700 text-[11px] font-bold">${totalKolf} Kolf</span>` : ''}
-                ${vaso ? `<span class="px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 text-[11px] font-bold">${escapeHTML(vaso.jenis_obat)} ${vaso.dosis_aktif}</span>` : ''}
-              </div>
-            </td>
-            <td class="py-3.5 px-3 text-right whitespace-nowrap" onclick="event.stopPropagation()">
-              <div class="inline-flex items-center gap-1">
-                <button onclick="selectPatientDetail('${p.id}')" class="px-3 py-1.5 rounded-full bg-royal-50 hover:bg-royal-600 hover:text-white text-royal-700 text-xs font-bold transition">Detail</button>
-                <button onclick="openPatientModal('${p.id}')" class="w-8 h-8 rounded-full hover:bg-white text-slate-500 hover:text-royal-700 inline-flex items-center justify-center" title="Edit Pasien">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487z"/></svg>
+
+              <div class="flex items-center gap-1.5 sm:gap-2 shrink-0" onclick="event.stopPropagation()">
+                <button type="button" onclick="toggleCollapsePatientCard('${p.id}', event)" class="w-8 h-8 rounded-xl hover:bg-white/15 text-white/90 flex items-center justify-center transition" title="${isCollapsed ? 'Buka daftar obat' : 'Lipat daftar obat'}">
+                  <svg class="w-4 h-4 transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
                 </button>
-                <button onclick="deletePatient('${p.id}')" class="w-8 h-8 rounded-full hover:bg-white text-slate-400 hover:text-rose-600 inline-flex items-center justify-center" title="Hapus Pasien">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                <button type="button" onclick="openPatientModal('${p.id}')" class="w-8 h-8 rounded-xl bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition" title="Edit Pasien & Obat">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487z"/></svg>
+                </button>
+                <button type="button" onclick="deletePatient('${p.id}')" class="w-8 h-8 rounded-xl bg-white/15 hover:bg-rose-500 text-white flex items-center justify-center transition" title="Hapus Pasien">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
                 </button>
               </div>
-            </td>
-          </tr>
+            </div>
+
+            <!-- Medication Rows List -->
+            <div class="${isCollapsed ? 'hidden' : 'divide-y divide-slate-100'}">
+              ${rowsHtml}
+            </div>
+          </div>
         `;
       }).join('');
     }
@@ -2376,7 +2588,6 @@
       const id = document.getElementById('edit-patient-id').value;
       const existingPatient = id ? state.pasien.find(x => x.id === id) : null;
 
-      // 1. Kumpulkan daftar obat
       const collectedObat = [];
       const collectedAntibiotik = [];
 
@@ -2431,7 +2642,6 @@
         }
       });
 
-      // 2. Kumpulkan daftar infus
       const collectedInfusItems = [];
       document.querySelectorAll('.modal-infus-item').forEach(row => {
         const cairan = row.querySelector('[data-field="cairan"]').value.trim();
@@ -2450,7 +2660,6 @@
         }));
       });
 
-      // 3. Kumpulkan rencana tindakan (satu baris = satu ceklis)
       const rawTindakan = document.getElementById('p-rencana-tindakan').value || '';
       const lines = rawTindakan.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
       const existingRegularActions = existingPatient ? getPatientRegularActions(existingPatient) : [];
@@ -2631,7 +2840,6 @@
         </div>
       `;
 
-      // 1. Obat Table
       const obatTbody = document.getElementById('detail-obat-tbody');
       if (!p.obat || p.obat.length === 0) {
         obatTbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">Belum ada jadwal obat.</td></tr>`;
@@ -2652,7 +2860,6 @@
         `).join('');
       }
 
-      // 2. Infus Terpasang List
       const infusListEl = document.getElementById('detail-infus-list');
       const infusItems = getPatientInfusList(p);
       if (infusItems.length === 0) {
@@ -2685,7 +2892,6 @@
         `).join('');
       }
 
-      // 3. Antibiotik List
       const abList = document.getElementById('detail-ab-list');
       if (!p.antibiotik || p.antibiotik.length === 0) {
         abList.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Belum ada antibiotik dicatat.</p>`;
@@ -2705,7 +2911,6 @@
         `).join('');
       }
 
-      // 4. Transfusi List
       const totalKolf = (p.transfusi || []).reduce((s, t) => s + Number(t.kolf || 0), 0);
       document.getElementById('detail-tf-total').textContent = `${totalKolf} Kolf`;
       const tfList = document.getElementById('detail-tf-list');
@@ -2727,7 +2932,6 @@
         `).join('');
       }
 
-      // 5. Tindakan List
       const tdList = document.getElementById('detail-tindakan-list');
       const regularActions = getPatientRegularActions(p);
       if (regularActions.length === 0) {
