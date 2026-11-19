@@ -1215,6 +1215,7 @@
     // =========================================================================
     let supabaseClient = null;
     let realtimeChannel = null;
+    let pollingInterval = null;
     let isSupabaseOnline = false;
 
     let currentUser = null;
@@ -1508,27 +1509,62 @@
 
     function stopRealtimeSync() {
       if (realtimeChannel && supabaseClient) {
-        supabaseClient.removeChannel(realtimeChannel);
+        try {
+          supabaseClient.removeChannel(realtimeChannel);
+        } catch (e) {}
       }
       realtimeChannel = null;
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
+      }
+    }
+
+    function startPollingFallback() {
+      if (pollingInterval) return;
+      // Fallback sinkronisasi berkala jika WebSocket diblokir oleh sandbox/iframe
+      pollingInterval = setInterval(() => {
+        if (isSupabaseOnline && document.visibilityState === 'visible') {
+          fetchAllFromSupabase(true);
+        }
+      }, 10000);
     }
 
     function startRealtimeSync() {
       if (!supabaseClient) return;
       stopRealtimeSync();
 
-      realtimeChannel = supabaseClient
-        .channel('kardek-dahlia-realtime')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'pasien' }, () => {
-          fetchAllFromSupabase(true);
-        })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'balance_cairan' }, () => {
-          fetchAllFromSupabase(true);
-        })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'vasoaktif' }, () => {
-          fetchAllFromSupabase(true);
-        })
-        .subscribe();
+      // Hindari membuka WebSocket langsung jika berjalan di dalam iframe sandboxed (seperti Canvas Preview)
+      const isInIframe = (() => {
+        try { return window.self !== window.top; } catch (e) { return true; }
+      })();
+
+      if (isInIframe) {
+        startPollingFallback();
+        return;
+      }
+
+      try {
+        realtimeChannel = supabaseClient
+          .channel('kardek-dahlia-realtime')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'pasien' }, () => {
+            fetchAllFromSupabase(true);
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'balance_cairan' }, () => {
+            fetchAllFromSupabase(true);
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'vasoaktif' }, () => {
+            fetchAllFromSupabase(true);
+          })
+          .subscribe((status) => {
+            if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+              startPollingFallback();
+            }
+          });
+      } catch (err) {
+        console.warn('WebSocket tidak diizinkan di lingkungan ini, beralih ke auto-sync berkala:', err);
+        startPollingFallback();
+      }
     }
 
     async function manualRefreshData() {
